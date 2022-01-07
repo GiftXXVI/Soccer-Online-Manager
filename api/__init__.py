@@ -1,6 +1,7 @@
 import models
 from api.players import players_bp
 from api.countries import countries_bp
+from api.positions import positions_bp
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -11,6 +12,7 @@ def create_app():
     # create and configure the app
     app = Flask(__name__)
     app.register_blueprint(countries_bp)
+    app.register_blueprint(positions_bp)
     app.register_blueprint(players_bp)
     CORS(app)
     db, migrate = models.setup_db(app)

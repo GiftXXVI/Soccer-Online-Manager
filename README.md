@@ -115,3 +115,81 @@ curl -X DELETE http://127.0.0.1:5000/countries/2
   "success": true
 }
 ```
+
+### Positions
+
+#### GET `/positions`
+##### Sample Request and Response
+
+```bash
+curl -X GET http://127.0.0.1:5000/positions
+```
+
+```json
+{
+  "positions": [
+    {
+      "id": 1,
+      "initial_players": 3,
+      "name": "Goalkeeper"
+    }
+  ],
+  "success": true
+}
+```
+
+#### GET `/positions/{position_id}`
+##### Sample Request and Response
+```bash
+curl -X GET http://127.0.0.1:5000/positions/1
+```
+
+```json
+{
+  "position": {
+    "id": 1,
+    "initial_players": 3,
+    "name": "Goalkeeper"
+  },
+  "success": true
+}
+```
+
+#### POST `/positions`
+##### Sample Request and Response
+```bash
+curl -X POST -H 'Content-Type:application/json' -d '{"name":"GoalKeeper","initial_players":"3"}' http://127.0.0.1:5000/positions
+```
+
+```json
+{
+  "created": 1,
+  "success": true
+}
+```
+
+#### PATCH `/positions`
+##### Sample Request and Response
+```bash
+curl -X PATCH -H 'Content-Type:application/json' -d '{"name":"Goalkeeper","initial_players":"3"}' http://127.0.0.1:5000/positions/1
+```
+
+```json
+{
+  "modified": 1,
+  "success": true
+}
+```
+
+#### DELETE `/positions`
+##### Sample Request and Response
+```bash
+curl -X DELETE http://127.0.0.1:5000/positions/2
+```
+
+```json
+{
+  "deleted": 2,
+  "success": true
+}
+```

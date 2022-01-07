@@ -1,7 +1,4 @@
-from os import error
-from typing import final
 from flask import Blueprint
-from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
 from models import Country
 from flask import request, abort, jsonify
@@ -22,6 +19,7 @@ def get_countries() -> jsonify:
 
 @countries_bp.route('/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id) -> jsonify:
+    '''get a country by its id'''
     country = Country.query.filter(Country.id == country_id).one_or_none()
     if country is None:
         abort(404)

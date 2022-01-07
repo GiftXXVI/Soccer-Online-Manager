@@ -96,12 +96,12 @@ class Player(db.Model, OnlineManagerModel):
 class Position(db.Model, OnlineManagerModel):
     __tablename__ = 'position'
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String(), nullable=False, unique=True)
     initial_players = db.Column(db.Integer(), nullable=False)
     players = db.relationship('Player', backref='position', lazy=True)
 
     def format(self):
-        return {'id': self.id}
+        return {'id': self.id, 'name': self.name, 'initial_players': self.initial_players}
 
 
 class Country(db.Model, OnlineManagerModel):
@@ -112,4 +112,4 @@ class Country(db.Model, OnlineManagerModel):
     teams = db.relationship('Team', backref='country', lazy=True)
 
     def format(self):
-        return {'id': self.id, 'name': self.name}
+        return {'id': self.id, 'name': self.names}
