@@ -1,8 +1,9 @@
 import os
 import decimal
+from random import choice
 
 
-def get_db_uri():
+def get_db_uri() -> str:
     if os.getenv('APP_MODE') == 'LIVE':
         db_conf_name = os.getenv('LIVEDB_NAME')
         db_conf_user = os.getenv('LIVEDB_USER')
@@ -25,12 +26,38 @@ def get_db_uri():
         return test_url
 
 
-def get_app_settings():
+def get_app_settings() -> dict:
     setup = dict()
     try:
-        setup['INIT_PLAYER_VALUE'] = decimal.Decimal(os.getenv('INIT_PLAYER_VALUE'))
-        setup['INIT_TEAM_BUDGET'] = decimal.Decimal(os.getenv('INIT_TEAM_BUDGET'))
+        setup['INIT_PLAYER_VALUE'] = decimal.Decimal(
+            os.getenv('INIT_PLAYER_VALUE'))
+        setup['INIT_TEAM_BUDGET'] = decimal.Decimal(
+            os.getenv('INIT_TEAM_BUDGET'))
     except decimal.DecimalException:
         setup['INIT_PLAYER_VALUE'] = decimal.Decimal(1000000)
         setup['INIT_TEAM_BUDGET'] = decimal.Decimal(5000000)
     return setup
+
+
+def get_firstname() -> list:
+    firstnames = ['James', 'Jack', 'Harry', 'Jacob', 'Charles', 'Thomas', 'Peter', 'George', 'William', 'Joseph', 'Michael',
+                  'Alexander', 'Jacques', 'Jean', 'Michel', 'Pierre', 'Jean-Baptiste', 'Antoine', 'Claude', 'Phillip', 'Frederic',
+                  'Jean-Luc', 'Jean-Paul', 'Abimbola', 'Abdalla', 'Adebayo', 'Ahmed', 'Ayodele', 'Adetokunbo', 'Kgomotso'
+                  'Kojo', 'Kwabena', 'Kwaku', 'Kofi', 'Kwame', 'Akwesi', 'Chiyembekezo', 'Fatsani', 'Kondwani', 'Kumbukani', 'Limbani ',
+                  'Limbikani', 'Mayeso', 'Mphatso', 'Alinafe', 'Akuzike', 'Mayamiko', 'Takondwa', 'Yamikani', 'Pilirani']
+    return choice(firstnames)
+
+
+def get_lastname() -> str:
+    lastnames = ['Martin', 'Duval', 'Leroy', 'Simon', 'Meyer', 'Muller', 'Schmitt', 'Schneider', 'Weber', 'Fischer', 'Weiss', 'Garcia'
+                 'Martinez', 'Blanc', 'Fernandez', 'Lopez', 'Sanchez', 'Perez', 'Da Silva', 'Petit', 'Dos Santos', 'Ferreira', 'Rodrigues',
+                 'Fernandes', 'Lambert', 'Dupont', 'Leclerc', 'Lejeune', 'Renard', 'Bouchard', 'Tremblay', 'Petit', 'Robert', 'Moreau',
+                 'Silva', 'Santos', 'Sousa', 'Oliveira', 'Álvarez', 'Castro', 'Romero', 'Suárez', 'Núñez', 'Rossi', 'Méndez', 'Blanco', 'Pereyra'
+                 'Medina', 'Herrera', 'Colombo', 'Peralta', 'Ledesma', 'Guzmán', 'Maldonado', 'Barbosa', 'Cardoso', 'Teixeira', 'Gonçalves',
+                 'Banda', 'Phiri', 'Mwale', 'Mkandawire', 'Moyo', 'Kumwenda', 'Nyasulu', 'Ngwira', 'Msiska', 'Kachingwe', 'Chibwana', 'Milanzi', 'Sakala'
+                 'Kapalamula', 'Kamwana', 'Mwenda', 'Mataka', 'Kasambala', 'Kapira', 'Kabaghe', 'Liwonde', 'Chikafa', 'Mkwanda', 'Diallo',
+                 'Traore', 'Coulibaly', 'Moussa', 'Keita', 'Suleiman', 'Mwangi', 'Hamadou', 'Sene', 'Mba', 'Shaban', 'Ingabire', 'Muhumed', 'Mbatha',
+                 'Mofokeng', 'Mido', 'Wang', 'Li', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou', 'Kim', 'Lee', 'Park', 'Jeong', 'Yang'
+                 'Sato', 'Suzuki', 'Takahash', 'Tanaka', 'Watanabe', 'Yamamoto', 'Nakamura', 'Ivanov', 'Kravtsov', 'Dimitrov', 'Svoboda', 'Popov',
+                 'Dvořák', 'Kowalski', 'Kamiński']
+    return choice(lastnames)
