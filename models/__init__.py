@@ -21,14 +21,9 @@ def setup_db(app):
 class OnlineManagerModel():
     def insert(self):
         db.session.add(self)
-        self.apply()
-
-    def update(self):
-        self.apply()
 
     def delete(self):
         db.session.delete(self)
-        self.apply()
 
     def apply(self):
         db.session.commit()
@@ -47,16 +42,16 @@ class Account(db.Model, OnlineManagerModel):
     __tablename__ = 'account'
     id = db.Column(db.Integer(), primary_key=True)
     email = db.Column(db.String(), unique=True, nullable=False)
-    teams = db.relationship('Team', backref='user', lazy=True)
+    teams = db.relationship('Team', backref='account', lazy=True)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
+    def format(self):
+        return {'id': self.id, 'email': self.email}
 
 
 class Team(db.Model, OnlineManagerModel):
     __tablename__ = 'team'
     id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey(
+    account_id = db.Column(db.Integer(), db.ForeignKey(
         'account.id'), unique=True, nullable=False)
     budget = db.Column(db.Numeric(), nullable=False,
                        default=defaults['INIT_TEAM_BUDGET'])
@@ -70,8 +65,8 @@ class Team(db.Model, OnlineManagerModel):
             val += p.value
         return val
 
-    def __repr__(self) -> str:
-        return super().__repr__()
+    def format(self):
+        return {'id': self.id, 'account_id': self.account_id, 'budget': self.budget, 'country_id': self.country_id}
 
 
 class Player(db.Model, OnlineManagerModel):
@@ -94,8 +89,8 @@ class Player(db.Model, OnlineManagerModel):
         today = now.date()
         return relativedelta(today, self.date_of_birth).years
 
-    def __repr__(self) -> str:
-        return super().__repr__()
+    def format(self):
+        return {'id': self.id, 'firstname': self.firstname, 'lastname': self.lastname, 'date_of_birth': self.date_of_birth, 'country_id': self.country_id, 'team_id': self.team_id, 'position_id': self.position_id, 'value': self.value, 'transfer_listed': self.transfer_listed}
 
 
 class Position(db.Model, OnlineManagerModel):
@@ -105,16 +100,16 @@ class Position(db.Model, OnlineManagerModel):
     initial_players = db.Column(db.Integer(), nullable=False)
     players = db.relationship('Player', backref='position', lazy=True)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
+    def format(self):
+        return {'id': self.id}
 
 
 class Country(db.Model, OnlineManagerModel):
     __tablename__ = 'country'
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String(), nullable=False, unique=True)
     players = db.relationship('Player', backref='country', lazy=True)
     teams = db.relationship('Team', backref='country', lazy=True)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
+    def format(self):
+        return {'id': self.id, 'name': self.name}

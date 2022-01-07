@@ -1,6 +1,7 @@
 import models
 from api.players import players_bp
-from flask import Flask
+from api.countries import countries_bp
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -9,6 +10,7 @@ from flask_cors import CORS
 def create_app():
     # create and configure the app
     app = Flask(__name__)
+    app.register_blueprint(countries_bp)
     app.register_blueprint(players_bp)
     CORS(app)
     db, migrate = models.setup_db(app)
@@ -25,3 +27,72 @@ def after_request(response):
     response.headers.add(
         'Access-Control-Allow-Methods', 'GET, OPTIONS, PATCH, DELETE, POST')
     return response
+
+@app.errorhandler(404)
+def error_404(error):
+    message = 'not found'
+    return jsonify({
+        'success': False,
+        'error': 404,
+        'message': message.lower()
+    }), 404
+
+
+@app.errorhandler(401)
+def error_401(error):
+    message = 'unauthorized'
+    return jsonify({
+        'success': False,
+        'error': 401,
+        'message': message.lower()
+    }), 401
+
+
+@app.errorhandler(403)
+def error_403(error):
+    message = 'forbidden'
+    return jsonify({
+        'success': False,
+        'error': 403,
+        'message': message.lower()
+    }), 401
+
+
+@app.errorhandler(405)
+def error_405(error):
+    message = 'not allowed'
+    return jsonify({
+        'success': False,
+        'error': 405,
+        'message': message.lower()
+    }), 405
+
+
+@app.errorhandler(422)
+def error_422(error):
+    message = 'unprocessable'
+    return jsonify({
+        'success': False,
+        'error': 422,
+        'message': message.lower()
+    }), 422
+
+
+@app.errorhandler(400)
+def error_400(error):
+    message = 'bad request'
+    return jsonify({
+        'success': False,
+        'error': 400,
+        'message': message.lower()
+    }), 400
+
+
+@app.errorhandler(500)
+def error_500(error):
+    message = 'server error'
+    return jsonify({
+        'success': False,
+        'error': 500,
+        'message': message.lower()
+    }), 500
