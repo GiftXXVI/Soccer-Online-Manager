@@ -59,6 +59,7 @@ class Account(db.Model, OnlineManagerModel):
 class Team(db.Model, OnlineManagerModel):
     __tablename__ = 'team'
     id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(), nullable=True)
     account_id = db.Column(db.Integer(), db.ForeignKey(
         'account.id'), unique=True, nullable=False)
     budget = db.Column(db.Numeric(), nullable=False,
@@ -77,7 +78,12 @@ class Team(db.Model, OnlineManagerModel):
         return val
 
     def format(self) -> dict:
-        return {'id': self.id, 'account_id': self.account_id, 'budget': self.budget, 'country_id': self.country_id}
+        return {'id': self.id,
+                'account_id': self.account_id,
+                'account': self.account.email,
+                'budget': self.budget,
+                'country_id': self.country_id,
+                'country': self.country.name}
 
 
 class Player(db.Model, OnlineManagerModel):
@@ -109,7 +115,17 @@ class Player(db.Model, OnlineManagerModel):
         return relativedelta(today, self.date_of_birth).years
 
     def format(self) -> dict:
-        return {'id': self.id, 'firstname': self.firstname, 'lastname': self.lastname, 'date_of_birth': self.date_of_birth, 'country_id': self.country_id, 'team_id': self.team_id, 'position_id': self.position_id, 'value': self.value, 'transfer_listed': self.transfer_listed}
+        return {'id': self.id,
+                'firstname': self.firstname,
+                'lastname': self.lastname,
+                'date_of_birth': self.date_of_birth,
+                'country_id': self.country_id,
+                'country': self.country.name,
+                'team_id': self.team_id,
+                'team': self.team.name,
+                'position_id': self.position_id,
+                'value': self.value,
+                'transfer_listed': self.transfer_listed}
 
 
 class Position(db.Model, OnlineManagerModel):
@@ -123,12 +139,25 @@ class Position(db.Model, OnlineManagerModel):
         return {'id': self.id, 'name': self.name, 'initial_players': self.initial_players}
 
 
+class City(db.Model, OnlineManagerModel):
+    __tablename__ = 'city'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    country_id = db.Column(db.Integer(), db.ForeignKey(
+        'country.id'), nullable=False)
+    db.UniqueConstraint(name, country_id, name='UX_name_country')
+
+    def format(self) -> dict:
+        return {'id': self.id, 'name': self.name, 'country_id': self.country_id, 'country': self.country.name}
+
+
 class Country(db.Model, OnlineManagerModel):
     __tablename__ = 'country'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False, unique=True)
     players = db.relationship('Player', backref='country', lazy=True)
     teams = db.relationship('Team', backref='country', lazy=True)
+    cities = db.relationship('City', backref='country', lazy=True)
 
     def format(self) -> dict:
-        return {'id': self.id, 'name': self.names}
+        return {'id': self.id, 'name': self.name}

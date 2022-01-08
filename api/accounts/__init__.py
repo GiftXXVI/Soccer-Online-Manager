@@ -1,7 +1,7 @@
-from os import error
 from flask import Blueprint
 from models import Account, Player, Position, Team
 from flask import request, abort, jsonify
+from email.utils import parseaddr
 import sqlalchemy
 
 accounts_bp = Blueprint('accounts_bp', __name__)
@@ -31,6 +31,16 @@ def get_account(account_id) -> jsonify:
         })
 
 
+@accounts_bp.route('/accounts/teams/<int:account_id>', methods=['GET'])
+def get_teams(account_id):
+    teams = Team.query.filter(Team.account_id == account_id).all()
+    teams_f = [team.format() for team in teams]
+    return jsonify({
+        'success': True,
+        'teams': teams_f
+    })
+
+
 @accounts_bp.route('/accounts', methods=['POST'])
 def create_account() -> jsonify:
     '''create a user account, their team and team players.)'''
@@ -42,11 +52,12 @@ def create_account() -> jsonify:
         request_email = request_body.get('email', None)
         request_country = request_body.get('country', None)
         # add email validation
-        if request_email is None or request_country is None:
+        if request_email is None or parseaddr(request_email) == ('', '') or request_country is None:
             abort(400)
         else:
             account = Account(email=request_email)
             try:
+                account.setup()
                 account.insert()
                 account.stage()
                 team = Team(account_id=account.id, country_id=request_country)

@@ -1,6 +1,6 @@
 from flask import Blueprint
 import sqlalchemy
-from models import Country
+from models import Country, City
 from flask import request, abort, jsonify
 
 countries_bp = Blueprint('countries_bp', __name__)
@@ -14,6 +14,17 @@ def get_countries() -> jsonify:
     return jsonify({
         'success': True,
         'countries': countries_f
+    })
+
+
+@countries_bp.route('/countries/cities/<int:country_id>', methods=['GET'])
+def get_cities(country_id) -> jsonify:
+    '''get a country by its id'''
+    cities = City.query.filter(City.country_id == country_id).one_or_none()
+    cities_f = [city.format() for city in cities]
+    return jsonify({
+        'success': True,
+        'cities': cities_f
     })
 
 
