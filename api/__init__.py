@@ -4,6 +4,7 @@ from api.countries import countries_bp
 from api.positions import positions_bp
 from api.accounts import accounts_bp
 from api.cities import cities_bp
+from api.teams import teams_bp
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -18,6 +19,7 @@ def create_app():
     app.register_blueprint(cities_bp)
     app.register_blueprint(accounts_bp)
     app.register_blueprint(players_bp)
+    app.register_blueprint(teams_bp)
     CORS(app)
     db, migrate = models.setup_db(app)
     return app, db, migrate

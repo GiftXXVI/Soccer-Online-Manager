@@ -50,12 +50,12 @@ def create_account() -> jsonify:
         abort(400)
     else:
         request_email = request_body.get('email', None)
+        parsed_email = parseaddr(request_email)[1]
         request_country = request_body.get('country', None)
-        # add email validation
-        if request_email is None or parseaddr(request_email) == ('', '') or request_country is None:
+        if request_email is None or len(parsed_email) == 0 or request_country is None:
             abort(400)
         else:
-            account = Account(email=request_email)
+            account = Account(email=parsed_email)
             try:
                 account.setup()
                 account.insert()
@@ -97,13 +97,14 @@ def modify_account(account_id) -> jsonify:
         abort(400)
     else:
         request_email = request_body.get('email', None)
+        parsed_email = parseaddr(request_email)[1]
         request_active = request_body.get('active', None)
-        if request_email is None or request_active is None:
+        if request_email is None or len(parsed_email) == 0 or request_active is None:
             abort(400)
         else:
             account = Account.query.filter(
                 Account.id == account_id).one_or_none()
-            account.email = request_email
+            account.email = parsed_email
             account.active = bool(request_active)
             try:
                 account.apply()
@@ -135,7 +136,6 @@ def delete_account(account_id) -> jsonify:
         except sqlalchemy.exc.SQLAlchemyError as e:
             account.rollback()
             error_state = True
-            print(e)
         finally:
             account.dispose()
             if error_state:

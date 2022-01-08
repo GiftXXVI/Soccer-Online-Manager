@@ -61,3 +61,13 @@ def get_lastname() -> str:
                  'Sato', 'Suzuki', 'Takahashi', 'Tanaka', 'Watanabe', 'Yamamoto', 'Nakamura', 'Ivanov', 'Kravtsov', 'Dimitrov', 'Svoboda', 'Popov',
                  'Dvořák', 'Kowalski', 'Kamiński']
     return choice(lastnames)
+
+
+def get_teamsuffix() -> str:
+    suffixes = ['United', 'Rovers', 'City', 'Galaxy', 'Stars', 'FC', 'CF', 'SC', 'SV', 'Eleven', 'Club', 'Lions',
+                'Strikers', 'Eagles', 'Rhinos', 'Wolves', 'Bulldogs', 'Braves', 'Stallions', 'Warriors', 'Daredevils',
+                'Wanderers', 'Bullets', 'Shapshooters', 'Blitz', 'Thunder', 'Crushers', 'Dragons', 'Kamikazes', 'Devils'
+                'Hawks', 'Predators', 'Shockers', 'Spiders', 'Comets', 'Stingrays', 'Jets', 'Dynamo', 'Scorpions'
+                'Dynamite', 'Raptors', 'Vikings', 'Knights', 'Sharks', 'Wizards', 'Pirates', 'Town', 'Aliens'
+                ]
+    return choice(suffixes)

@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
 from random import randrange
+from random import choice
 from dateutil.relativedelta import relativedelta
 
 db = SQLAlchemy()
@@ -70,6 +71,15 @@ class Team(db.Model, OnlineManagerModel):
 
     def setup(self) -> None:
         self.budget = defaults['INIT_TEAM_BUDGET']
+        cities = City.query.filter(City.country_id == self.country_id).all()
+        if len(cities) == 0:
+            sample = 'abcdefghijklmnopqrstuvwxyz'
+            length = 10
+            string = (''.join(choice(sample)
+                      for i in range(length))).capitalize()
+            self.name = f'{string} {configuration.get_teamsuffix()}'
+        else:
+            self.name = f'{choice(cities).name} {configuration.get_teamsuffix()}'
 
     def value(self) -> int:
         val = 0
@@ -83,7 +93,8 @@ class Team(db.Model, OnlineManagerModel):
                 'account': self.account.email,
                 'budget': self.budget,
                 'country_id': self.country_id,
-                'country': self.country.name}
+                'country': self.country.name,
+                'value': self.value()}
 
 
 class Player(db.Model, OnlineManagerModel):
@@ -148,7 +159,10 @@ class City(db.Model, OnlineManagerModel):
     db.UniqueConstraint(name, country_id, name='UX_name_country')
 
     def format(self) -> dict:
-        return {'id': self.id, 'name': self.name, 'country_id': self.country_id, 'country': self.country.name}
+        return {'id': self.id,
+                'name': self.name,
+                'country_id': self.country_id,
+                'country': self.country.name}
 
 
 class Country(db.Model, OnlineManagerModel):
