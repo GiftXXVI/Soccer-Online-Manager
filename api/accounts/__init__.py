@@ -9,7 +9,7 @@ accounts_bp = Blueprint('accounts_bp', __name__)
 
 @accounts_bp.route('/accounts', methods=['GET'])
 def get_accounts() -> jsonify:
-    '''get a list of user accounts'''
+    '''get a list of accounts'''
     accounts = Account.query.all()
     accounts_f = [account.format() for account in accounts]
     return jsonify({
@@ -20,7 +20,7 @@ def get_accounts() -> jsonify:
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['GET'])
 def get_account(account_id) -> jsonify:
-    '''get a single user account'''
+    '''get an account by id'''
     account = Account.query.filter(Account.id == account_id).one_or_none()
     if account is None:
         abort(404)
@@ -33,17 +33,17 @@ def get_account(account_id) -> jsonify:
 
 @accounts_bp.route('/accounts/teams/<int:account_id>', methods=['GET'])
 def get_teams(account_id):
-    teams = Team.query.filter(Team.account_id == account_id).all()
-    teams_f = [team.format() for team in teams]
+    '''get team associated with account'''
+    team = Team.query.filter(Team.account_id == account_id).one_or_none()
     return jsonify({
         'success': True,
-        'teams': teams_f
+        'teams': team.format()
     })
 
 
 @accounts_bp.route('/accounts', methods=['POST'])
 def create_account() -> jsonify:
-    '''create a user account, their team and team players.)'''
+    '''create account, team and players.'''
     request_body = request.get_json()
     error_state = False
     if request_body is None:
@@ -90,7 +90,7 @@ def create_account() -> jsonify:
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['PATCH'])
 def modify_account(account_id) -> jsonify:
-    '''modify a user account'''
+    '''modify an account'''
     request_body = request.get_json()
     error_state = False
     if request_body is None:
@@ -104,27 +104,30 @@ def modify_account(account_id) -> jsonify:
         else:
             account = Account.query.filter(
                 Account.id == account_id).one_or_none()
-            account.email = parsed_email
-            account.active = bool(request_active)
-            try:
-                account.apply()
-            except sqlalchemy.exc.SQLAlchemyError as e:
-                account.rollback()
-                error_state = True
-            finally:
-                account.dispose()
-                if error_state:
-                    abort(500)
-                else:
-                    return jsonify({
-                        'success': True,
-                        'modified': account_id
-                    })
+            if account is None:
+                abort(400)
+            else:
+                account.email = parsed_email
+                account.active = bool(request_active)
+                try:
+                    account.apply()
+                except sqlalchemy.exc.SQLAlchemyError as e:
+                    account.rollback()
+                    error_state = True
+                finally:
+                    account.dispose()
+                    if error_state:
+                        abort(500)
+                    else:
+                        return jsonify({
+                            'success': True,
+                            'modified': account_id
+                        })
 
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['DELETE'])
 def delete_account(account_id) -> jsonify:
-    '''delete a user account'''
+    '''delete an account'''
     error_state = False
     account = Account.query.filter(Account.id == account_id).one_or_none()
     if account is None:

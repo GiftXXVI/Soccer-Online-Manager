@@ -52,14 +52,14 @@ def get_lastname() -> str:
     lastnames = ['Martin', 'Duval', 'Leroy', 'Simon', 'Meyer', 'Muller', 'Schmitt', 'Schneider', 'Weber', 'Fischer', 'Weiss', 'Garcia'
                  'Martinez', 'Blanc', 'Fernandez', 'Lopez', 'Sanchez', 'Perez', 'Da Silva', 'Petit', 'Dos Santos', 'Ferreira', 'Rodrigues',
                  'Fernandes', 'Lambert', 'Dupont', 'Leclerc', 'Lejeune', 'Renard', 'Bouchard', 'Tremblay', 'Petit', 'Robert', 'Moreau',
-                 'Silva', 'Santos', 'Sousa', 'Oliveira', 'Álvarez', 'Castro', 'Romero', 'Suárez', 'Núñez', 'Rossi', 'Méndez', 'Blanco', 'Pereyra'
-                 'Medina', 'Herrera', 'Colombo', 'Peralta', 'Ledesma', 'Guzmán', 'Maldonado', 'Barbosa', 'Cardoso', 'Teixeira', 'Gonçalves',
+                 'Silva', 'Santos', 'Sousa', 'Oliveira', 'Alvarez', 'Castro', 'Romero', 'Suarez', 'Nunez', 'Rossi', 'Mendez', 'Blanco', 'Pereyra'
+                 'Medina', 'Herrera', 'Colombo', 'Peralta', 'Ledesma', 'Guzman', 'Maldonado', 'Barbosa', 'Cardoso', 'Teixeira', 'Goncalves',
                  'Banda', 'Phiri', 'Mwale', 'Mkandawire', 'Moyo', 'Kumwenda', 'Nyasulu', 'Ngwira', 'Msiska', 'Kachingwe', 'Chibwana', 'Milanzi', 'Sakala'
                  'Kapalamula', 'Kamwana', 'Mwenda', 'Mataka', 'Kasambala', 'Kapira', 'Kabaghe', 'Liwonde', 'Chikafa', 'Mkwanda', 'Diallo',
                  'Traore', 'Coulibaly', 'Moussa', 'Keita', 'Suleiman', 'Mwangi', 'Hamadou', 'Sene', 'Mba', 'Shaban', 'Ingabire', 'Muhumed', 'Mbatha',
                  'Mofokeng', 'Mido', 'Wang', 'Li', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou', 'Kim', 'Lee', 'Park', 'Jeong', 'Yang'
                  'Sato', 'Suzuki', 'Takahashi', 'Tanaka', 'Watanabe', 'Yamamoto', 'Nakamura', 'Ivanov', 'Kravtsov', 'Dimitrov', 'Svoboda', 'Popov',
-                 'Dvořák', 'Kowalski', 'Kamiński']
+                 'Dvorak', 'Kowalski', 'Kaminski']
     return choice(lastnames)
 
 

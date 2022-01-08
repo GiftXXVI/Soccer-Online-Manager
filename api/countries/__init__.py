@@ -8,7 +8,7 @@ countries_bp = Blueprint('countries_bp', __name__)
 
 @countries_bp.route('/countries', methods=['GET'])
 def get_countries() -> jsonify:
-    '''get a list of all countries'''
+    '''get a list of countries'''
     countries = Country.query.all()
     countries_f = [country.format() for country in countries]
     return jsonify({
@@ -19,8 +19,8 @@ def get_countries() -> jsonify:
 
 @countries_bp.route('/countries/cities/<int:country_id>', methods=['GET'])
 def get_cities(country_id) -> jsonify:
-    '''get a country by its id'''
-    cities = City.query.filter(City.country_id == country_id).one_or_none()
+    '''get a list of cities in a country'''
+    cities = City.query.filter(City.country_id == country_id).all()
     cities_f = [city.format() for city in cities]
     return jsonify({
         'success': True,
@@ -30,7 +30,7 @@ def get_cities(country_id) -> jsonify:
 
 @countries_bp.route('/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id) -> jsonify:
-    '''get a country by its id'''
+    '''get a country by id'''
     country = Country.query.filter(Country.id == country_id).one_or_none()
     if country is None:
         abort(404)
@@ -86,21 +86,24 @@ def modify_country(country_id) -> jsonify:
         else:
             country = Country.query.filter(
                 Country.id == country_id).one_or_none()
-            try:
-                country.name = request_name
-                country.apply()
-            except sqlalchemy.exc.SQLAlchemyError as e:
-                country.rollback()
-                error_state = True
-            finally:
-                country.dispose()
-                if error_state:
-                    abort(500)
-                else:
-                    return jsonify({
-                        'success': True,
-                        'modified': country_id
-                    })
+            if country is None:
+                abort(400)
+            else:
+                try:
+                    country.name = request_name
+                    country.apply()
+                except sqlalchemy.exc.SQLAlchemyError as e:
+                    country.rollback()
+                    error_state = True
+                finally:
+                    country.dispose()
+                    if error_state:
+                        abort(500)
+                    else:
+                        return jsonify({
+                            'success': True,
+                            'modified': country_id
+                        })
 
 
 @countries_bp.route('/countries/<int:country_id>', methods=['DELETE'])

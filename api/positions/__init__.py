@@ -8,7 +8,7 @@ positions_bp = Blueprint('positions_bp', __name__)
 
 @positions_bp.route('/positions', methods=['GET'])
 def get_positions() -> jsonify:
-    '''get a list of all countries'''
+    '''get a list of positions'''
     positions = Position.query.all()
     positions_f = [position.format() for position in positions]
     return jsonify({
@@ -19,7 +19,7 @@ def get_positions() -> jsonify:
 
 @positions_bp.route('/positions/<int:position_id>', methods=['GET'])
 def get_position(position_id) -> jsonify:
-    '''get a position by its id'''
+    '''get a position by id'''
     position = Position.query.filter(Position.id == position_id).one_or_none()
     if position is None:
         abort(404)
@@ -44,7 +44,7 @@ def create_position() -> jsonify:
             abort(400)
         else:
             position = Position(name=request_name,
-                                initial_players=request_initial_players)
+                                initial_players=request_initial_players).one_or_none()
             try:
                 position.insert()
                 position.apply()
@@ -78,22 +78,26 @@ def modify_position(position_id) -> jsonify:
         else:
             position = Position.query.filter(
                 Position.id == position_id).one_or_none()
-            try:
-                position.name = request_name
-                position.initial_players = request_initial_players
-                position.apply()
-            except sqlalchemy.exc.SQLAlchemyError as e:
-                position.rollback()
-                error_state = True
-            finally:
-                position.dispose()
-                if error_state:
-                    abort(500)
-                else:
-                    return jsonify({
-                        'success': True,
-                        'modified': position_id
-                    })
+            if position is None:
+                abort(400)
+            else:
+                try:
+                    position.name = request_name
+                    position.initial_players = request_initial_players
+                    position.apply()
+                except sqlalchemy.exc.SQLAlchemyError as e:
+                    position.rollback()
+                    error_state = True
+                finally:
+                    position.dispose()
+                    if error_state:
+                        abort(500)
+                    else:
+                        return jsonify({
+                            'success': True,
+                            'modified': position_id
+                        })
+
 
 @positions_bp.route('/positions/<int:position_id>', methods=['DELETE'])
 def delete_position(position_id) -> jsonify:

@@ -17,6 +17,7 @@ def get_teams() -> jsonify:
 
 @teams_bp.route('/teams/<int:team_id>', methods=['GET'])
 def get_team(team_id) -> jsonify:
+    '''get a team by id'''
     team = Team.query.filter(Team.id == team_id).one_or_none()
     if team is None:
         abort(404)
@@ -29,6 +30,7 @@ def get_team(team_id) -> jsonify:
 
 @teams_bp.route('/teams/players/<int:team_id>', methods=['GET'])
 def get_players(team_id) -> jsonify:
+    '''get a list of team players'''
     players = Player.query.filter(Player.team_id == team_id).all()
     players_f = [player.format() for player in players]
     return jsonify({
