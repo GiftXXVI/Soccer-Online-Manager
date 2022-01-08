@@ -58,6 +58,6 @@ def get_lastname() -> str:
                  'Kapalamula', 'Kamwana', 'Mwenda', 'Mataka', 'Kasambala', 'Kapira', 'Kabaghe', 'Liwonde', 'Chikafa', 'Mkwanda', 'Diallo',
                  'Traore', 'Coulibaly', 'Moussa', 'Keita', 'Suleiman', 'Mwangi', 'Hamadou', 'Sene', 'Mba', 'Shaban', 'Ingabire', 'Muhumed', 'Mbatha',
                  'Mofokeng', 'Mido', 'Wang', 'Li', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou', 'Kim', 'Lee', 'Park', 'Jeong', 'Yang'
-                 'Sato', 'Suzuki', 'Takahash', 'Tanaka', 'Watanabe', 'Yamamoto', 'Nakamura', 'Ivanov', 'Kravtsov', 'Dimitrov', 'Svoboda', 'Popov',
+                 'Sato', 'Suzuki', 'Takahashi', 'Tanaka', 'Watanabe', 'Yamamoto', 'Nakamura', 'Ivanov', 'Kravtsov', 'Dimitrov', 'Svoboda', 'Popov',
                  'Dvořák', 'Kowalski', 'Kamiński']
     return choice(lastnames)

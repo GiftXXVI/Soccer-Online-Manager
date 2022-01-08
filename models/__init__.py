@@ -46,7 +46,11 @@ class Account(db.Model, OnlineManagerModel):
     __tablename__ = 'account'
     id = db.Column(db.Integer(), primary_key=True)
     email = db.Column(db.String(), unique=True, nullable=False)
+    active = db.Column(db.Boolean(), nullable=False, default=True)
     teams = db.relationship('Team', backref='account', lazy=True)
+
+    def setup(self) -> None:
+        self.active = True
 
     def format(self) -> dict:
         return {'id': self.id, 'email': self.email}
