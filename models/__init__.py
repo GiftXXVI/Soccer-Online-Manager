@@ -43,18 +43,30 @@ class OnlineManagerModel():
         db.session.close()
 
 
+class Credential(db.Model, OnlineManagerModel):
+    __tablename__ = 'credential'
+    id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(), unique=True, nullable=False)
+    confirmation_code = db.Column(db.String(), nullable=False)
+    email_confirmed = db.Column(db.Boolean(), nullable=False, default=True)
+    challenge = db.Column(db.String(), nullable=False)
+    reset_required = db.Column(db.Boolean(), nullable=False, default=True)
+    account = db.relationship('Account', backref='credential', lazy=True)
+
+
 class Account(db.Model, OnlineManagerModel):
     __tablename__ = 'account'
     id = db.Column(db.Integer(), primary_key=True)
-    email = db.Column(db.String(), unique=True, nullable=False)
     active = db.Column(db.Boolean(), nullable=False, default=True)
+    credential_id = db.Column(db.Integer(), db.ForeignKey(
+        'credential.id'), unique=True, nullable=False)
     teams = db.relationship('Team', backref='account', lazy=True)
 
     def setup(self) -> None:
         self.active = True
 
     def format(self) -> dict:
-        return {'id': self.id, 'email': self.email}
+        return {'id': self.id, 'email': self.credential.email}
 
 
 class Team(db.Model, OnlineManagerModel):
@@ -111,6 +123,7 @@ class Player(db.Model, OnlineManagerModel):
     value = db.Column(db.Numeric(), nullable=False,
                       default=defaults['INIT_PLAYER_VALUE'])
     transfer_listed = db.Column(db.Boolean(), nullable=False, default=False)
+    transfers = db.relationship('Transfer', backref='player', lazy=True)
 
     def setup(self) -> None:
         now = datetime.now()
@@ -124,6 +137,9 @@ class Player(db.Model, OnlineManagerModel):
         now = datetime.now()
         today = now.date()
         return relativedelta(today, self.date_of_birth).years
+
+    def name(self):
+        return f'{self.firstname} {self.lastname}'
 
     def format(self) -> dict:
         return {'id': self.id,
@@ -175,3 +191,36 @@ class Country(db.Model, OnlineManagerModel):
 
     def format(self) -> dict:
         return {'id': self.id, 'name': self.name}
+
+
+class Transfer(db.Model, OnlineManagerModel):
+    __tablename__ = 'transfer'
+    id = db.Column(db.Integer(), primary_key=True)
+    player_id = db.Column(db.Integer(), db.ForeignKey(
+        'player.id'), nullable=False)
+    from_team_id = db.Column(db.Integer(), db.ForeignKey(
+        'team.id'), nullable=False)
+    to_team_id = db.Column(db.Integer(), db.ForeignKey(
+        'player.id'), nullable=False)
+    transfer_value = db.Column(db.Numeric(), nullable=False)
+    value_increase = db.Column(db.Integer(), nullable=True)
+    date_listed = db.Column(db.DateTime(), nullable=False)
+    date_completed = db.Column(db.DateTime(), nullable=True)
+
+    from_team = db.relationship("Team", foreign_keys=[from_team_id])
+    to_team = db.relationship("Team", foreign_keys=[to_team_id])
+
+    def setup(self):
+        self.date_listed = datetime.now()
+        pass
+
+    def format(self) -> dict:
+        return {'id': self.id,
+                'player_id': self.player_id,
+                'player': self.player.name(),
+                'from_team_id': self.from_team_id,
+                'to_team_id': self.to_team_id,
+                'transfer_value': self.transfer_value,
+                'value_increase': self.value_increase,
+                'date_listed': self.date_listed,
+                'date_completed': self.date_completed}
