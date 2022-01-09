@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from random import randrange
 from random import choice
 from dateutil.relativedelta import relativedelta
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -14,6 +15,7 @@ defaults = configuration.get_app_settings()
 def setup_db(app) -> tuple:
     app.config["SQLALCHEMY_DATABASE_URI"] = configuration.get_db_uri()
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["JWT_SECRET_KEY"] = "super-secret"
     db.app = app
     db.init_app(app)
     migrate = Migrate(app, db)
@@ -47,23 +49,41 @@ class Credential(db.Model, OnlineManagerModel):
     __tablename__ = 'credential'
     id = db.Column(db.Integer(), primary_key=True)
     email = db.Column(db.String(), unique=True, nullable=False)
+    firstname = db.Column(db.String(), unique=False, nullable=False)
+    lastname = db.Column(db.String(), unique=False, nullable=False)
+    date_of_birth = db.Column(db.DateTime(), nullable=False)
     confirmation_code = db.Column(db.String(), nullable=False)
     email_confirmed = db.Column(db.Boolean(), nullable=False, default=True)
     challenge = db.Column(db.String(), nullable=False)
     reset_required = db.Column(db.Boolean(), nullable=False, default=True)
+    active = db.Column(db.Boolean(), nullable=False, default=True)
     account = db.relationship('Account', backref='credential', lazy=True)
+
+    def setup(self) -> None:
+        self.active = False
+        self.email_confirmed = False
+        self.reset_required = False
+
+    def activate(self)->None:
+        self.active = True
+        self.email_confirmed = True
+        self.reset_required = False
+
+    def age(self) -> int:
+        now = datetime.now()
+        today = now.date()
+        return relativedelta(today, self.date_of_birth).years
+
+    def name(self):
+        return f'{self.firstname} {self.lastname}'
 
 
 class Account(db.Model, OnlineManagerModel):
     __tablename__ = 'account'
     id = db.Column(db.Integer(), primary_key=True)
-    active = db.Column(db.Boolean(), nullable=False, default=True)
     credential_id = db.Column(db.Integer(), db.ForeignKey(
         'credential.id'), unique=True, nullable=False)
     teams = db.relationship('Team', backref='account', lazy=True)
-
-    def setup(self) -> None:
-        self.active = True
 
     def format(self) -> dict:
         return {'id': self.id, 'email': self.credential.email}
@@ -201,7 +221,7 @@ class Transfer(db.Model, OnlineManagerModel):
     from_team_id = db.Column(db.Integer(), db.ForeignKey(
         'team.id'), nullable=False)
     to_team_id = db.Column(db.Integer(), db.ForeignKey(
-        'player.id'), nullable=False)
+        'team.id'), nullable=False)
     transfer_value = db.Column(db.Numeric(), nullable=False)
     value_increase = db.Column(db.Integer(), nullable=True)
     date_listed = db.Column(db.DateTime(), nullable=False)

@@ -1,7 +1,6 @@
 from flask import Blueprint
 from models import Account, Player, Position, Team
 from flask import request, abort, jsonify
-from email.utils import parseaddr
 import sqlalchemy
 
 accounts_bp = Blueprint('accounts_bp', __name__)
@@ -48,16 +47,13 @@ def create_account() -> jsonify:
     error_state = False
     if request_body is None:
         abort(400)
-    else:
-        request_email = request_body.get('email', None)
-        parsed_email = parseaddr(request_email)[1]
+    else:        
         request_country = request_body.get('country', None)
-        if request_email is None or len(parsed_email) == 0 or request_country is None:
+        if request_country is None:
             abort(400)
         else:
-            account = Account(email=parsed_email)
+            account = Account()
             try:
-                account.setup()
                 account.insert()
                 account.stage()
                 team = Team(account_id=account.id, country_id=request_country)
@@ -96,33 +92,25 @@ def modify_account(account_id) -> jsonify:
     if request_body is None:
         abort(400)
     else:
-        request_email = request_body.get('email', None)
-        parsed_email = parseaddr(request_email)[1]
-        request_active = request_body.get('active', None)
-        if request_email is None or len(parsed_email) == 0 or request_active is None:
+        account = Account.query.filter(
+            Account.id == account_id).one_or_none()
+        if account is None:
             abort(400)
         else:
-            account = Account.query.filter(
-                Account.id == account_id).one_or_none()
-            if account is None:
-                abort(400)
-            else:
-                account.email = parsed_email
-                account.active = bool(request_active)
-                try:
-                    account.apply()
-                except sqlalchemy.exc.SQLAlchemyError as e:
-                    account.rollback()
-                    error_state = True
-                finally:
-                    account.dispose()
-                    if error_state:
-                        abort(500)
-                    else:
-                        return jsonify({
-                            'success': True,
-                            'modified': account_id
-                        })
+            try:
+                account.apply()
+            except sqlalchemy.exc.SQLAlchemyError as e:
+                account.rollback()
+                error_state = True
+            finally:
+                account.dispose()
+                if error_state:
+                    abort(500)
+                else:
+                    return jsonify({
+                        'success': True,
+                        'modified': account_id
+                    })
 
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['DELETE'])
