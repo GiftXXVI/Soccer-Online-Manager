@@ -69,7 +69,7 @@ def modify_transfer(transfer_id):
             if transfer is None:
                 abort(400)
             else:
-                if transfer.date_completed is not None:
+                if not (transfer.date_completed is None):
                     try:
                         transfer.value = request_value
                         transfer.apply()
@@ -98,8 +98,11 @@ def delete_transfer(transfer_id) -> jsonify:
         abort(400)
     else:
         try:
-            transfer.delete()
-            transfer.apply()
+            if not (transfer.date_completed is None):
+                transfer.delete()
+                transfer.apply()
+            else:
+                abort(400)
         except sqlalchemy.exc.SQLAlchemyError as e:
             transfer.rollback()
             error_state = True

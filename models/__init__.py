@@ -108,6 +108,7 @@ class Team(db.Model, OnlineManagerModel):
     country_id = db.Column(db.Integer(), db.ForeignKey(
         'country.id'), nullable=False)
     players = db.relationship('Player', backref='team', lazy=True)
+    bids = db.relationship('Bid', backref='team', lazy=True)
 
     def setup(self) -> None:
         self.budget = defaults['INIT_TEAM_BUDGET']
@@ -166,7 +167,7 @@ class Player(db.Model, OnlineManagerModel):
         today = now.date()
         return relativedelta(today, self.date_of_birth).years
 
-    def name(self):
+    def name(self)->str:
         return f'{self.firstname} {self.lastname}'
 
     def format(self) -> dict:
@@ -234,13 +235,13 @@ class Transfer(db.Model, OnlineManagerModel):
     value_increase = db.Column(db.Integer(), nullable=True)
     date_listed = db.Column(db.DateTime(), nullable=False)
     date_completed = db.Column(db.DateTime(), nullable=True)
+    bids = db.relationship('Bid', backref='transfer', lazy=True)
 
     from_team = db.relationship("Team", foreign_keys=[from_team_id])
     to_team = db.relationship("Team", foreign_keys=[to_team_id])
 
-    def setup(self):
+    def setup(self)->None:
         self.date_listed = datetime.now()
-        pass
 
     def format(self) -> dict:
         return {'id': self.id,
@@ -252,3 +253,26 @@ class Transfer(db.Model, OnlineManagerModel):
                 'value_increase': self.value_increase,
                 'date_listed': self.date_listed,
                 'date_completed': self.date_completed}
+
+class Bid(db.Model,OnlineManagerModel):
+    __tablename__='bid'
+    id = db.Column(db.Integer(), primary_key=True)
+    transfer_id = id = db.Column(db.Integer(), db.ForeignKey('transfer.id'),nullable=False)
+    team_id = db.Column(db.Integer(), db.ForeignKey(
+        'team.id'), nullable=False)
+    bid_value = db.Column(db.Numeric(), nullable=False)
+    date_of_bid = db.Column(db.DateTime(), nullable=False)
+    selected = db.Column(db.Boolean(), nullable=False, default=True)
+
+    def setup()->None:
+        now = datetime.now()
+        self.date_of_bid = now.date()
+
+    def format(self)->dict:
+        return {
+            'id':self.id,
+            'transfer_id':self.transfer_id,
+            'team_id':self.team_id,
+            'bid_value':self.bid_value,
+            'date_of_bid':self.date_of_bid
+        }
