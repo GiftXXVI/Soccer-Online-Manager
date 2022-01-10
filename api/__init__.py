@@ -6,6 +6,8 @@ from api.accounts import accounts_bp
 from api.cities import cities_bp
 from api.teams import teams_bp
 from api.portal import portal_bp
+from api.transfers import transfers_bp
+from api.bids import bids_bp
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -23,6 +25,8 @@ def create_app():
     app.register_blueprint(players_bp)
     app.register_blueprint(teams_bp)
     app.register_blueprint(portal_bp)
+    app.register_blueprint(transfers_bp)
+    app.register_blueprint(bids_bp)
     CORS(app)
     db, migrate = models.setup_db(app)
     jwt = JWTManager(app)

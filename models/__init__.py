@@ -167,7 +167,7 @@ class Player(db.Model, OnlineManagerModel):
         today = now.date()
         return relativedelta(today, self.date_of_birth).years
 
-    def name(self)->str:
+    def name(self) -> str:
         return f'{self.firstname} {self.lastname}'
 
     def format(self) -> dict:
@@ -240,7 +240,7 @@ class Transfer(db.Model, OnlineManagerModel):
     from_team = db.relationship("Team", foreign_keys=[from_team_id])
     to_team = db.relationship("Team", foreign_keys=[to_team_id])
 
-    def setup(self)->None:
+    def setup(self) -> None:
         self.date_listed = datetime.now()
 
     def format(self) -> dict:
@@ -254,25 +254,27 @@ class Transfer(db.Model, OnlineManagerModel):
                 'date_listed': self.date_listed,
                 'date_completed': self.date_completed}
 
-class Bid(db.Model,OnlineManagerModel):
-    __tablename__='bid'
+
+class Bid(db.Model, OnlineManagerModel):
+    __tablename__ = 'bid'
     id = db.Column(db.Integer(), primary_key=True)
-    transfer_id = id = db.Column(db.Integer(), db.ForeignKey('transfer.id'),nullable=False)
+    transfer_id = db.Column(
+        db.Integer(), db.ForeignKey('transfer.id'), nullable=False)
     team_id = db.Column(db.Integer(), db.ForeignKey(
         'team.id'), nullable=False)
     bid_value = db.Column(db.Numeric(), nullable=False)
     date_of_bid = db.Column(db.DateTime(), nullable=False)
     selected = db.Column(db.Boolean(), nullable=False, default=True)
 
-    def setup()->None:
+    def setup(self) -> None:
         now = datetime.now()
         self.date_of_bid = now.date()
 
-    def format(self)->dict:
+    def format(self) -> dict:
         return {
-            'id':self.id,
-            'transfer_id':self.transfer_id,
-            'team_id':self.team_id,
-            'bid_value':self.bid_value,
-            'date_of_bid':self.date_of_bid
+            'id': self.id,
+            'transfer_id': self.transfer_id,
+            'team_id': self.team_id,
+            'bid_value': self.bid_value,
+            'date_of_bid': self.date_of_bid
         }

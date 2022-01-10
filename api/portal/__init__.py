@@ -259,20 +259,21 @@ def confirm_reset_password() -> jsonify:
     if request_body is None:
         abort(400)
     else:
-        request_email = request_body.get('email',None)
+        request_email = request_body.get('email', None)
         request_challenge = request_body.get('password')
-        request_code = request_body.get('code',None)
+        request_code = request_body.get('code', None)
         parsed_email = parseaddr(request_email)[1]
-        if request_email is not None and /
-        len(parsed_email)>0 and /
-        request_code is not None /
-        and request_code is not None:
-            credential = Credential.query.filter(Credential.email==parsed_email).one_or_none()
-            
+        if request_email is not None and \
+                len(parsed_email) > 0 and \
+                request_code is not None \
+                and request_code is not None:
+            credential = Credential.query.filter(
+                Credential.email == parsed_email).one_or_none()
+
             if credential is None:
                 abort(400)
 
-            if ph.verify(credential.confirmation_code,Credential.get_confirmation_code(request_code)):
+            if ph.verify(credential.confirmation_code, Credential.get_confirmation_code(request_code)):
                 credential.challenge = ph.hash(request_challenge)
                 try:
                     credential.apply()
