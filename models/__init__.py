@@ -264,11 +264,12 @@ class Bid(db.Model, OnlineManagerModel):
         'team.id'), nullable=False)
     bid_value = db.Column(db.Numeric(), nullable=False)
     date_of_bid = db.Column(db.DateTime(), nullable=False)
-    selected = db.Column(db.Boolean(), nullable=False, default=True)
+    selected = db.Column(db.Boolean(), nullable=False, default=False)
 
     def setup(self) -> None:
         now = datetime.now()
         self.date_of_bid = now.date()
+        self.selected = False
 
     def format(self) -> dict:
         return {
