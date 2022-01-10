@@ -7,6 +7,7 @@ accounts_bp = Blueprint('accounts_bp', __name__)
 
 
 @accounts_bp.route('/accounts', methods=['GET'])
+@jwt_required()
 def get_accounts() -> jsonify:
     '''get a list of accounts'''
     accounts = Account.query.all()
@@ -18,6 +19,7 @@ def get_accounts() -> jsonify:
 
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['GET'])
+@jwt_required()
 def get_account(account_id) -> jsonify:
     '''get an account by id'''
     account = Account.query.filter(Account.id == account_id).one_or_none()
@@ -31,6 +33,7 @@ def get_account(account_id) -> jsonify:
 
 
 @accounts_bp.route('/accounts/teams/<int:account_id>', methods=['GET'])
+@jwt_required()
 def get_teams(account_id):
     '''get team associated with account'''
     team = Team.query.filter(Team.account_id == account_id).one_or_none()
@@ -41,6 +44,7 @@ def get_teams(account_id):
 
 
 @accounts_bp.route('/accounts', methods=['POST'])
+@jwt_required()
 def create_account() -> jsonify:
     '''create account, team and players.'''
     request_body = request.get_json()
@@ -85,6 +89,7 @@ def create_account() -> jsonify:
 
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['PATCH'])
+@jwt_required()
 def modify_account(account_id) -> jsonify:
     '''modify an account'''
     request_body = request.get_json()
@@ -114,6 +119,7 @@ def modify_account(account_id) -> jsonify:
 
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['DELETE'])
+@jwt_required()
 def delete_account(account_id) -> jsonify:
     '''delete an account'''
     error_state = False

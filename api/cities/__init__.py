@@ -7,6 +7,7 @@ cities_bp = Blueprint('cities_bp', __name__)
 
 
 @cities_bp.route('/cities', methods=['GET'])
+@jwt_required()
 def get_cities() -> jsonify:
     '''get a list of cities'''
     cities = City.query.all()
@@ -18,6 +19,7 @@ def get_cities() -> jsonify:
 
 
 @cities_bp.route('/cities/<int:city_id>', methods=['GET'])
+@jwt_required()
 def get_city(city_id) -> jsonify:
     '''get a city by id'''
     city = City.query.filter(City.id == city_id).one_or_none()
@@ -31,6 +33,7 @@ def get_city(city_id) -> jsonify:
 
 
 @cities_bp.route('/cities', methods=['POST'])
+@jwt_required()
 def create_city() -> jsonify:
     '''create a city'''
     request_body = request.get_json()
@@ -64,6 +67,7 @@ def create_city() -> jsonify:
 
 
 @cities_bp.route('/cities/<int:city_id>', methods=['PATCH'])
+@jwt_required()
 def modify_city(city_id) -> jsonify:
     '''modify a city name and country'''
     request_body = request.get_json()
@@ -100,6 +104,7 @@ def modify_city(city_id) -> jsonify:
 
 
 @cities_bp.route('/cities/<int:city_id>', methods=['DELETE'])
+@jwt_required()
 def delete_city(city_id) -> jsonify:
     '''delete a city'''
     error_state = False

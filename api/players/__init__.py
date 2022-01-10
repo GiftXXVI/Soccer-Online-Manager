@@ -7,6 +7,7 @@ players_bp = Blueprint('players_bp', __name__)
 
 
 @players_bp.route('/players', methods=['GET'])
+@jwt_required()
 def get_players() -> jsonify:
     '''get a list of players'''
     players = Player.query.all()
@@ -18,6 +19,7 @@ def get_players() -> jsonify:
 
 
 @players_bp.route('/players/<int:player_id>', methods=['GET'])
+@jwt_required()
 def get_player(player_id):
     '''get a player by id'''
     player = Player.query.filter(Player.id == player_id).one_or_none()
@@ -31,6 +33,7 @@ def get_player(player_id):
 
 
 @players_bp.route('/players/<int:player_id>', methods=['PATCH'])
+@jwt_required()
 def modify_player(player_id):
     '''modify a player name'''
     request_body = request.get_json()

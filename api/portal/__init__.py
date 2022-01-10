@@ -77,6 +77,7 @@ def create_credential() -> jsonify:
 
 
 @portal_bp.route('/portal/confirm/<int:credential_id>', methods=['POST'])
+@jwt_required(fresh=True)
 def confirm_credential(credential_id) -> jsonify:
     request_body = request.get_json()
     error_state = False

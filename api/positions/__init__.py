@@ -7,6 +7,7 @@ positions_bp = Blueprint('positions_bp', __name__)
 
 
 @positions_bp.route('/positions', methods=['GET'])
+@jwt_required()
 def get_positions() -> jsonify:
     '''get a list of positions'''
     positions = Position.query.all()
@@ -18,6 +19,7 @@ def get_positions() -> jsonify:
 
 
 @positions_bp.route('/positions/<int:position_id>', methods=['GET'])
+@jwt_required()
 def get_position(position_id) -> jsonify:
     '''get a position by id'''
     position = Position.query.filter(Position.id == position_id).one_or_none()
@@ -31,6 +33,7 @@ def get_position(position_id) -> jsonify:
 
 
 @positions_bp.route('/positions', methods=['POST'])
+@jwt_required()
 def create_position() -> jsonify:
     '''create a position'''
     request_body = request.get_json()
@@ -64,6 +67,7 @@ def create_position() -> jsonify:
 
 
 @positions_bp.route('/positions/<int:position_id>', methods=['PATCH'])
+@jwt_required()
 def modify_position(position_id) -> jsonify:
     '''modify a position name and initial players'''
     request_body = request.get_json()
@@ -100,6 +104,7 @@ def modify_position(position_id) -> jsonify:
 
 
 @positions_bp.route('/positions/<int:position_id>', methods=['DELETE'])
+@jwt_required()
 def delete_position(position_id) -> jsonify:
     '''delete a position'''
     error_state = False

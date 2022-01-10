@@ -10,6 +10,7 @@ bids_bp = Blueprint('bids_bp', __name__)
 
 
 @bids_bp.route('/teams/<int:team_id>/bids', methods=['GET'])
+@jwt_required()
 def get_team_bids(team_id):
     bids = Bid.query.filter(Bid.team_id==team_id).all()
     bids_f = [bid.format() for bid in bids]
@@ -22,6 +23,7 @@ def get_team_bids(team_id):
 
 
 @bids_bp.route('/transfers/<int:transfer_id>/bids', methods=['GET'])
+@jwt_required()
 def get_transfer_bids(transfer_id):
     bids = Bid.query.filter(Bid.transfer_id==transfer_id).all()
     bids_f = [bid.format() for in bids]
@@ -32,6 +34,7 @@ def get_transfer_bids(transfer_id):
 
 
 @bids_bp.route('/transfers/<int:transfer_id>/bids', methods=['POST'])
+@jwt_required()
 def create_bid(transfer_id) -> jsonify:
     '''submit a bid on a transfer'''
     request_body = request.get_json()
@@ -65,6 +68,7 @@ def create_bid(transfer_id) -> jsonify:
 
 
 @bids_bp.route('/bids/<int:bid_id>', methods=['PATCH'])
+@jwt_required()
 def modify_bid(bid_id) -> jsonify:
     '''modify a bid on a transfer'''
     request_body = request.get_json()
@@ -90,6 +94,7 @@ def modify_bid(bid_id) -> jsonify:
                 })
 
 @bids_bp.route('/transfer/<int:transfer_id>/bids', methods=['PATCH'])
+@jwt_required()
 def select_bid()->jsonify:
     '''select a bid'''
     request_body = request.get_json()

@@ -7,6 +7,7 @@ countries_bp = Blueprint('countries_bp', __name__)
 
 
 @countries_bp.route('/countries', methods=['GET'])
+@jwt_required()
 def get_countries() -> jsonify:
     '''get a list of countries'''
     countries = Country.query.all()
@@ -18,6 +19,7 @@ def get_countries() -> jsonify:
 
 
 @countries_bp.route('/countries/cities/<int:country_id>', methods=['GET'])
+@jwt_required()
 def get_cities(country_id) -> jsonify:
     '''get a list of cities in a country'''
     cities = City.query.filter(City.country_id == country_id).all()
@@ -29,6 +31,7 @@ def get_cities(country_id) -> jsonify:
 
 
 @countries_bp.route('/countries/<int:country_id>', methods=['GET'])
+@jwt_required()
 def get_country(country_id) -> jsonify:
     '''get a country by id'''
     country = Country.query.filter(Country.id == country_id).one_or_none()
@@ -42,6 +45,7 @@ def get_country(country_id) -> jsonify:
 
 
 @countries_bp.route('/countries', methods=['POST'])
+@jwt_required()
 def create_country() -> jsonify:
     '''create a country'''
     request_body = request.get_json()
@@ -73,6 +77,7 @@ def create_country() -> jsonify:
 
 
 @countries_bp.route('/countries/<int:country_id>', methods=['PATCH'])
+@jwt_required()
 def modify_country(country_id) -> jsonify:
     '''modify a country name'''
     request_body = request.get_json()
@@ -107,6 +112,7 @@ def modify_country(country_id) -> jsonify:
 
 
 @countries_bp.route('/countries/<int:country_id>', methods=['DELETE'])
+@jwt_required()
 def delete_country(country_id) -> jsonify:
     '''delete a country'''
     error_state = False

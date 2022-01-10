@@ -7,6 +7,7 @@ teams_bp = Blueprint('teams_bp', __name__)
 
 
 @teams_bp.route('/teams', methods=['GET'])
+@jwt_required()
 def get_teams() -> jsonify:
     '''get a list of all teams'''
     teams = Team.query.all()
@@ -18,6 +19,7 @@ def get_teams() -> jsonify:
 
 
 @teams_bp.route('/teams/<int:team_id>', methods=['GET'])
+@jwt_required()
 def get_team(team_id) -> jsonify:
     '''get a team by id'''
     team = Team.query.filter(Team.id == team_id).one_or_none()
@@ -31,6 +33,7 @@ def get_team(team_id) -> jsonify:
 
 
 @teams_bp.route('/teams/players/<int:team_id>', methods=['GET'])
+@jwt_required()
 def get_players(team_id) -> jsonify:
     '''get a list of team players'''
     players = Player.query.filter(Player.team_id == team_id).all()
@@ -42,6 +45,7 @@ def get_players(team_id) -> jsonify:
 
 
 @teams_bp.route('/teams/<int:team_id>', methods=['PATCH'])
+@jwt_required()
 def modify_team(team_id):
     '''modify a team name'''
     request_body = request.get_json()
