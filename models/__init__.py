@@ -64,10 +64,18 @@ class Credential(db.Model, OnlineManagerModel):
         self.email_confirmed = False
         self.reset_required = False
 
-    def activate(self)->None:
+    def activate(self) -> None:
         self.active = True
         self.email_confirmed = True
         self.reset_required = False
+
+    @staticmethod
+    def get_confirmation_code(code='') -> str:
+        now = datetime.now()
+        if len(code) > 0:
+            return f'{code}{now.strftime("%m%d%Y")}'
+        else:
+            return f'{str(randrange(10000, 100000))}{now.strftime("%m%d%Y")}'
 
     def age(self) -> int:
         now = datetime.now()
