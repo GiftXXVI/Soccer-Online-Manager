@@ -253,10 +253,43 @@ def reset_password() -> jsonify:
 
 
 @portal_bp.route('/portal/confirm_reset', methods=['PATCH'])
-@jwt_required()
-def confirm_reset_passwrd() -> jsonify:
+def confirm_reset_password() -> jsonify:
     request_body = request.get_json()
+    error_state = False
     if request_body is None:
         abort(400)
     else:
-        pass
+        request_email = request_body.get('email',None)
+        request_challenge = request_body.get('password')
+        request_code = request_body.get('code',None)
+        parsed_email = parseaddr(request_email)[1]
+        if request_email is not None and /
+        len(parsed_email)>0 and /
+        request_code is not None /
+        and request_code is not None:
+            credential = Credential.query.filter(Credential.email==parsed_email).one_or_none()
+            
+            if credential is None:
+                abort(400)
+
+            if ph.verify(credential.confirmation_code,Credential.get_confirmation_code(request_code)):
+                credential.challenge = ph.hash(request_challenge)
+                try:
+                    credential.apply()
+                except sqlalchemy.exc.SQLAlchemyError as e:
+                    credential.rollback()
+                    error_state = True
+                finally:
+                    credential.dispose()
+                    if error_state:
+                        abort(400)
+                    else:
+                        msg = EmailMessage()
+                        msg.set_content(
+                            f'Your password has been reset.\n If you did not initiate this action, please reset your password.\n')
+                        msg['Subject'] = f'Your password has been reset.'
+                        msg['From'] = 'no-reply@soccermanager.local'
+                        msg['To'] = parsed_email
+                        s = smtplib.SMTP(host='localhost', port=1025)
+                        s.send_message(msg)
+                        s.quit()
