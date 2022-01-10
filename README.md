@@ -31,6 +31,68 @@ flask db upgrade
 
 ## Resource Endpoint Library
 
+### Portal
+#### POST `/portal/register`
+##### Sample Request and Response
+```bash
+curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Gift","lastname":"Chimphonda","date_of_birth":"2001-11-13","password":"112hfhj@sjjPPPP","email":"gift@gmail.local"}' http://127.0.0.1:5000/portal/register
+```
+```json
+{
+  "created": 6,
+  "success": true
+}
+```
+```bash
+---------- MESSAGE FOLLOWS ----------
+b'Content-Type: text/plain; charset="utf-8"'
+b'Content-Transfer-Encoding: 7bit'
+b'MIME-Version: 1.0'
+b'Subject: Confirm your account.'
+b'From: no-reply@soccermanager.local'
+b'To: gift@gmail.local'
+b'X-Peer: 127.0.0.1'
+b''
+b'Please confirm your account. Your code is 73246.'
+b' The request id is 6.'
+------------ END MESSAGE ------------
+```
+#### POST `/portal/confirm/{credential_id}`
+##### Sample Request and Response
+```bash
+ curl -X POST -H "Content-Type:application/json" -d '{"code":"73246","email":"gift@gmail.local"}' http://127.0.0.1:5000/portal/confirm/6
+```
+```json
+{
+  "activated": 6,
+  "success": true
+}
+```
+#### POST `/portal/login`
+#### Sample Request and Response
+```bash
+curl -X POST -H "Content-Type:application/json" -d '{"email":"gift@gmail.local","password":"112hfhj@sjjPPPP"}' http://127.0.0.1:5000/portal/login
+```
+```json
+{
+  "success": true,
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxNzgyNTQ2LCJqdGkiOiI4MGI3ZjFiYi0xM2Y0LTRhMjEtYTZlNy05YzMzMDA5NGNjMTkiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZ2lmdEBnbWFpbC5sb2NhbCIsIm5iZiI6MTY0MTc4MjU0NiwiZXhwIjoxNjQxNzg2MTQ2fQ.dJDs8aFx41JGvbNvfqI04-h8rw3fwcQuQaPVGrj6u4Q"
+}
+```
+#### POST `/portal/refresh`
+##### Sample Refresh and Response
+```bash
+export TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxNzgyNTQ2LCJqdGkiOiI4MGI3ZjFiYi0xM2Y0LTRhMjEtYTZlNy05YzMzMDA5NGNjMTkiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZ2lmdEBnbWFpbC5sb2NhbCIsIm5iZiI6MTY0MTc4MjU0NiwiZXhwIjoxNjQxNzg2MTQ2fQ.dJDs8aFx41JGvbNvfqI04-h8rw3fwcQuQaPVGrj6u4Q
+```
+```bash
+ curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"gift@gmail.local","token":"$TOKEN"}' http://127.0.0.1:5000/portal/refresh
+```
+```json
+{
+  "success": true,
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY0MTc4Mjk0MywianRpIjoiMzJkZmQyOGUtMTNmOC00MTljLWI4ZGYtYWFjODk0NTM4YTMyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImdpZnRAZ21haWwubG9jYWwiLCJuYmYiOjE2NDE3ODI5NDMsImV4cCI6MTY0MTc4NjU0M30.9HX_ZBbMQJ4TRmHnFd6Yau7q_l3WoUqbdhjC_VBFbkM"
+}
+```
 ### Countries
 
 #### GET `/countries`

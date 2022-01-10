@@ -11,6 +11,7 @@ from email.utils import parseaddr
 from random import randrange
 import smtplib
 from email.message import EmailMessage
+from datetime import timedelta
 
 ph = PasswordHasher()
 
@@ -43,11 +44,11 @@ def create_credential() -> jsonify:
             credential = Credential(firstname=request_firstname,
                                     lastname=request_lastname,
                                     date_of_birth=request_dob,
-                                    challenge=request_password,
                                     email=request_email)
             credential.setup()
             confirmation_code = str(randrange(10000, 100000))
             credential.confirmation_code = ph.hash(confirmation_code)
+            credential.challenge = ph.hash(request_password)
             try:
                 credential.insert()
                 credential.apply()
@@ -76,8 +77,7 @@ def create_credential() -> jsonify:
                     })
 
 
-@portal_bp.route('/portal/confirm/<int:credential_id>', methods=['GET'])
-@jwt_required()
+@portal_bp.route('/portal/confirm/<int:credential_id>', methods=['POST'])
 def confirm_credential(credential_id) -> jsonify:
     request_body = request.get_json()
     error_state = False
@@ -89,14 +89,17 @@ def confirm_credential(credential_id) -> jsonify:
             abort(400)
         else:
             credential = Credential.query.filter(
-                Credential.id == Credential).one_or_none()
+                Credential.id == credential_id).one_or_none()
             if credential is None:
                 abort(400)
             else:
-                if ph.verify(credential.hash, request_code):
+                if ph.verify(credential.confirmation_code, request_code):
+                    if ph.check_needs_rehash(credential.confirmation_code):
+                        ph.hash(request_code)
                     try:
                         credential.activate()
                         credential.apply()
+                        credential.refresh()
                     except sqlalchemy.exc.SQLAlchemyError as e:
                         credential.rollback()
                         error_state = True
@@ -109,19 +112,65 @@ def confirm_credential(credential_id) -> jsonify:
                                 'success': True,
                                 'activated': credential.id
                             })
-
                 else:
                     abort(400)
 
 
-@portal_bp.route('/portal/login', methods=['GET'])
+@portal_bp.route('/portal/login', methods=['POST'])
 def issue_token() -> jsonify:
     request_body = request.get_json()
     error_state = False
     if request_body is None:
         abort(400)
     else:
-        pass
+        request_email = request_body.get('email', None)
+        request_challenge = request_body.get('password', None)
+        if request_email is None or request_challenge is None:
+            abort(400)
+        else:
+            credential = Credential.query.filter(
+                Credential.email == request_email).one_or_none()
+            if credential is None:
+                abort(401)
+            else:
+                if ph.verify(credential.challenge, request_challenge):
+                    if ph.check_needs_rehash(credential.challenge):
+                        ph.hash(request_challenge)
+                    if credential.active and not credential.reset_required:
+                        token = create_access_token(
+                            identity=request_email, expires_delta=timedelta(minutes=60), fresh=True)
+                        return jsonify({
+                            'success': True,
+                            'token': token
+                        })
+                    else:
+                        abort(401)
+                else:
+                    abort(401)
+
+
+@portal_bp.route('/portal/refresh', methods=['POST'])
+@jwt_required(fresh=True)
+def refresh_token() -> jsonify:
+    request_body = request.get_json()
+    if request_body is None:
+        abort(400)
+    else:
+        request_email = request_body.get('email', None)
+        request_token = request_body.get('token', None)
+        if request_email is None or request_token is None:
+            abort(400)
+        else:
+            identity = get_jwt_identity()
+            if request_email == identity:
+                token = create_access_token(
+                    identity=identity, expires_delta=timedelta(minutes=60), fresh=False)
+                return jsonify({
+                    'success': True,
+                    'token': token
+                })
+            else:
+                abort(401)
 
 
 @portal_bp.route('/portal/reset', methods=['GET'])
@@ -132,4 +181,5 @@ def reset_password() -> jsonify:
     if request_body is None:
         abort(400)
     else:
+
         pass
