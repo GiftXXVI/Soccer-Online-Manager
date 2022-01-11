@@ -43,7 +43,7 @@ def get_app_settings() -> dict:
 def get_firstname() -> list:
     firstnames = ['James', 'Jack', 'Harry', 'Jacob', 'Charles', 'Thomas', 'Peter', 'George', 'William', 'Joseph', 'Michael',
                   'Alexander', 'Jacques', 'Jean', 'Michel', 'Pierre', 'Jean-Baptiste', 'Antoine', 'Claude', 'Phillip', 'Frederic',
-                  'Jean-Luc', 'Jean-Paul', 'Abimbola', 'Abdalla', 'Adebayo', 'Ahmed', 'Ayodele', 'Adetokunbo', 'Kgomotso'
+                  'Jean-Luc', 'Jean-Paul', 'Abimbola', 'Abdalla', 'Adebayo', 'Ahmed', 'Ayodele', 'Adetokunbo', 'Kgomotso',
                   'Kojo', 'Kwabena', 'Kwaku', 'Kofi', 'Kwame', 'Akwesi', 'Chiyembekezo', 'Fatsani', 'Kondwani', 'Kumbukani', 'Limbani ',
                   'Limbikani', 'Mayeso', 'Mphatso', 'Alinafe', 'Akuzike', 'Mayamiko', 'Takondwa', 'Yamikani', 'Pilirani']
     return choice(firstnames)
@@ -58,7 +58,7 @@ def get_lastname() -> str:
                  'Banda', 'Phiri', 'Mwale', 'Mkandawire', 'Moyo', 'Kumwenda', 'Nyasulu', 'Ngwira', 'Msiska', 'Kachingwe', 'Chibwana', 'Milanzi', 'Sakala'
                  'Kapalamula', 'Kamwana', 'Mwenda', 'Mataka', 'Kasambala', 'Kapira', 'Kabaghe', 'Liwonde', 'Chikafa', 'Mkwanda', 'Diallo',
                  'Traore', 'Coulibaly', 'Moussa', 'Keita', 'Suleiman', 'Mwangi', 'Hamadou', 'Sene', 'Mba', 'Shaban', 'Ingabire', 'Muhumed', 'Mbatha',
-                 'Mofokeng', 'Mido', 'Wang', 'Li', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou', 'Kim', 'Lee', 'Park', 'Jeong', 'Yang'
+                 'Mofokeng', 'Mido', 'Wang', 'Li', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou', 'Kim', 'Lee', 'Park', 'Jeong', 
                  'Sato', 'Suzuki', 'Takahashi', 'Tanaka', 'Watanabe', 'Yamamoto', 'Nakamura', 'Ivanov', 'Kravtsov', 'Dimitrov', 'Svoboda', 'Popov',
                  'Dvorak', 'Kowalski', 'Kaminski']
     return choice(lastnames)

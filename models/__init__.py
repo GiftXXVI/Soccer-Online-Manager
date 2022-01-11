@@ -91,6 +91,7 @@ class Credential(db.Model, OnlineManagerModel):
 class Account(db.Model, OnlineManagerModel):
     __tablename__ = 'account'
     id = db.Column(db.Integer(), primary_key=True)
+    nickname = db.Column(db.String(), nullable=True)
     credential_id = db.Column(db.Integer(), db.ForeignKey(
         'credential.id'), unique=True, nullable=False)
     teams = db.relationship('Team', backref='account', lazy=True)
@@ -122,7 +123,7 @@ class Team(db.Model, OnlineManagerModel):
                       for i in range(length))).capitalize()
             self.name = f'{string} {configuration.get_teamsuffix()}'
         else:
-            self.name = f'{choice(cities).name} {configuration.get_teamsuffix()}'
+            self.name = f'{choice(cities).name} {configuration.get_teamsuffix()} {randrange(1000,9999)}'
 
     def value(self) -> int:
         val = 0
@@ -133,7 +134,7 @@ class Team(db.Model, OnlineManagerModel):
     def format(self) -> dict:
         return {'id': self.id,
                 'account_id': self.account_id,
-                'account': self.account.email,
+                'account': self.account.nickname,
                 'budget': self.budget,
                 'country_id': self.country_id,
                 'country': self.country.name,

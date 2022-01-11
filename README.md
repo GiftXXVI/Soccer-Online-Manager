@@ -40,21 +40,28 @@ python3 -m smtpd -n -c DebuggingServer localhost:8025
 ```
 
 ### Portal
+
 #### POST `/portal/register`
+
 ##### Sample Request and Response
+
 ```bash
 curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/register
 ```
+
 Or with an optional role parameter:
+
 ```bash
 curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"gift.chimphonda@gmail.local","password":";;87^child^BORROW^each^04;;","role":1}' http://127.0.0.1:5000/portal/register
 ```
+
 ```json
 {
   "created": 50,
   "success": true
 }
 ```
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -72,50 +79,68 @@ b'                        The confirmation code is 45777.'
 b'                        '
 ------------ END MESSAGE ------------
 ```
+
 #### POST `/portal/confirm/{credential_id}`
+
 ##### Sample Request and Response
+
 ```bash
 curl -X POST -H "Content-Type:application/json" -d '{"code":"45777","email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/confirm/50
 ```
+
 ```json
 {
   "activated": 50,
   "success": true
 }
 ```
+
 #### POST `/portal/login`
+
 #### Sample Request and Response
+
 ```bash
 curl -X POST -H "Content-Type:application/json" -d '{"email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/login
 ```
+
 ```json
 {
   "success": true,
   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxODkwOTY0LCJqdGkiOiIxYTcxMzk5Yy1mNmRlLTRmMTktOGI5NS0wYjY5MDUwNjFlOTYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiay5zYW50b3NAeWFob28ubG9jYWwiLCJuYmYiOjE2NDE4OTA5NjQsImV4cCI6MTY0MTg5NDU2NCwic21fcm9sZSI6MH0.ZilMCC5Z577Wdr3HyFB4nxBzZxb5HFSIzm5f3zm9dVY"
 }
 ```
+
 #### POST `/portal/refresh`
+
 ##### Sample Refresh and Response
+
 ```bash
 export TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxODkwOTY0LCJqdGkiOiIxYTcxMzk5Yy1mNmRlLTRmMTktOGI5NS0wYjY5MDUwNjFlOTYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiay5zYW50b3NAeWFob28ubG9jYWwiLCJuYmYiOjE2NDE4OTA5NjQsImV4cCI6MTY0MTg5NDU2NCwic21fcm9sZSI6MH0.ZilMCC5Z577Wdr3HyFB4nxBzZxb5HFSIzm5f3zm9dVY
 ```
+
 ```bash
 curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local","token":"$TOKEN"}' http://127.0.0.1:5000/portal/refresh
 ```
+
 ```json
 {
   "success": true,
   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY0MTg5MTQ4OCwianRpIjoiMDk0YWFjYjctYTE1MC00YzNlLWE4MTAtZGFjZDBiOGUzMDU5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imsuc2FudG9zQHlhaG9vLmxvY2FsIiwibmJmIjoxNjQxODkxNDg4LCJleHAiOjE2NDE4OTUwODgsInNtX3JvbGUiOjB9.ORyYHRVm6LGj__IDU1U0XftNyHv7xD48vTkPX7WDeO8"
 }
 ```
+
 #### PATCH `/portal/reset`
+
 ##### Sample Request and Response
+
 ###### Option 1: Provide Only Email
+
 Step 1
 
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/reset
 ```
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -131,16 +156,20 @@ b'                        Please use the code 30937 to set a new password.'
 b'                        Otherwise, ignore this email.'
 ------------ END MESSAGE ------------
 ```
+
 ```json
 {
   "reset": 50,
   "success": true
 }
 ```
+
 Step 2
+
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local","password":"C74LptkFL4seJZYQ", "code":"30937"}' http://127.0.0.1:5000/portal/setpassword
 ```
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -156,6 +185,7 @@ b'                        If you did not initiate this action, please reset you=
 b'r password.'
 ------------ END MESSAGE ------------
 ```
+
 ```json
 {
   "reset": 50,
@@ -164,10 +194,12 @@ b'r password.'
 ```
 
 ##### Option 2:Provide email and password
+
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local", "password":"
 Evn.ta]9zxP&#Wut", "old_password":"C74LptkFL4seJZYQ"}' http://127.0.0.1:5000/portal/reset
 ```
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -183,6 +215,7 @@ b'                            If you did not initiate this action, use the code=
 b' 12216 to set a new password.'
 ------------ END MESSAGE ------------
 ```
+
 ```json
 {
   "reset": 50,
@@ -489,6 +522,94 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions/
 ```json
 {
   "deleted": 7,
+  "success": true
+}
+```
+
+### Accounts
+
+#### GET `/accounts`
+
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/accounts
+```
+
+```json
+{
+  "accounts": [
+    {
+      "email": "gift.chimphonda@gmail.local",
+      "id": 17
+    },
+    {
+      "email": "k.santos@yahoo.local",
+      "id": 18
+    }
+  ],
+  "success": true
+}
+```
+
+#### GET `/accounts/{account_id}`
+
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18
+```
+
+```json
+{
+  "account": {
+    "email": "k.santos@yahoo.local",
+    "id": 18
+  },
+  "success": true
+}
+```
+
+#### GET `/accounts/{account_id}/teams/`
+
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18/teams
+```
+
+```json
+{
+  "success": true,
+  "teams": {
+    "account": "the_urge22",
+    "account_id": 18,
+    "budget": "5000000",
+    "country": "Algeria",
+    "country_id": 22,
+    "id": 9,
+    "value": "20000000"
+  }
+}
+```
+
+#### POST `/accounts`
+
+```bash
+curl -X POST -H "Authorization:Bearer $TOKEN2" -H "Content-Type:application/json" -d '{"country":14,"nickname":"slayer102"}' http://127.0.0.1:5000/accounts
+```
+
+```json
+{
+  "created": 17,
+  "success": true
+}
+```
+
+#### PATCH `/accounts`
+
+```bash
+curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"nickname":"the_urge22"}' http://127.0.0.1:
+5000/accounts/18
+```
+
+```json
+{
+  "modified": 18,
   "success": true
 }
 ```
