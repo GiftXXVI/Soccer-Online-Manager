@@ -44,6 +44,7 @@ class OnlineManagerModel():
     def dispose(self) -> None:
         db.session.close()
 
+
 class Credential(db.Model, OnlineManagerModel):
     __tablename__ = 'credential'
     id = db.Column(db.Integer(), primary_key=True)
@@ -63,7 +64,7 @@ class Credential(db.Model, OnlineManagerModel):
         self.active = False
         self.email_confirmed = False
         self.reset_required = False
-        self.role=0
+        self.role_id = role
 
     def activate(self) -> None:
         self.active = True

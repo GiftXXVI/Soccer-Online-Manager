@@ -32,6 +32,7 @@ def create_credential() -> jsonify:
         request_password = request_body.get('password', None)
         request_email = request_body.get('email', None)
         parsed_email = parseaddr(request_email)[1]
+        request_role = request_body.get('role', None)
         condition = request_firstname is not None and \
             request_lastname is not None and \
             request_dob is not None and \
@@ -46,7 +47,10 @@ def create_credential() -> jsonify:
                                     lastname=request_lastname,
                                     date_of_birth=request_dob,
                                     email=parsed_email)
-            credential.setup()
+            if request_role is not None:
+                credential.setup(role=request_role)
+            else:
+                credential.setup()
             confirmation_code = Credential.get_confirmation_code()
             credential.confirmation_code = ph.hash(confirmation_code)
             credential.challenge = ph.hash(request_password)
@@ -147,9 +151,9 @@ def issue_token() -> jsonify:
                     if ph.check_needs_rehash(credential.challenge):
                         ph.hash(request_challenge)
                     if credential.active and not credential.reset_required:
-                        claims = {'sm_role':credential.role}
+                        claims = {'sm_role': credential.role_id}
                         token = create_access_token(
-                            identity=request_email, expires_delta=timedelta(minutes=60), fresh=True, additional_claims:claims)
+                            identity=request_email, expires_delta=timedelta(minutes=60), fresh=True, additional_claims=claims)
                         return jsonify({
                             'success': True,
                             'token': token
@@ -165,6 +169,8 @@ def issue_token() -> jsonify:
 @jwt_required()
 def refresh_token() -> jsonify:
     request_body = request.get_json()
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(Credential.email==identity).one_or_none()
     if request_body is None:
         abort(400)
     else:
@@ -175,9 +181,9 @@ def refresh_token() -> jsonify:
         else:
             identity = get_jwt_identity()
             if request_email == identity:
-                claims = {'sm_role':credential.role}
+                claims = {'sm_role': credential.role_id}
                 token = create_access_token(
-                    identity=identity, expires_delta=timedelta(minutes=60), fresh=False,additional_claims=claims)
+                    identity=identity, expires_delta=timedelta(minutes=60), fresh=False, additional_claims=claims)
                 return jsonify({
                     'success': True,
                     'token': token
