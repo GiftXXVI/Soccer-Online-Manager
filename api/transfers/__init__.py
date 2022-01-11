@@ -1,12 +1,15 @@
 from flask import Blueprint
 from models import Transfer
 from flask import request, abort, jsonify
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 import sqlalchemy
 
 transfers_bp = Blueprint('transfers_bp', __name__)
 
 
 @transfers_bp.route('/transfers', methods=['GET'])
+@jwt_required()
 def get_transfers() -> jsonify:
     '''get a list of transfers'''
     transfers = Transfer.query.all()
@@ -18,6 +21,7 @@ def get_transfers() -> jsonify:
 
 
 @transfers_bp.route('/transfers', methods=['POST'])
+@jwt_required()
 def create_transfer() -> jsonify:
     '''create a transfer'''
     request_body = request.get_json()
@@ -53,6 +57,7 @@ def create_transfer() -> jsonify:
 
 
 @transfers_bp.route('/transfers/<int:transfer_id>', methods=['PATCH'])
+@jwt_required()
 def modify_transfer(transfer_id):
     '''modify a transfer value'''
     request_body = request.get_json()
@@ -90,6 +95,7 @@ def modify_transfer(transfer_id):
 
 
 @transfers_bp.route('/transfers/<int:transfer_id>', methods=['DELETE'])
+@jwt_required()
 def delete_transfer(transfer_id) -> jsonify:
     '''delete a transfer'''
     error_state = False

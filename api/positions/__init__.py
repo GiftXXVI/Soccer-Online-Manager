@@ -2,6 +2,8 @@ from flask import Blueprint
 import sqlalchemy
 from models import Position
 from flask import request, abort, jsonify
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 
 positions_bp = Blueprint('positions_bp', __name__)
 

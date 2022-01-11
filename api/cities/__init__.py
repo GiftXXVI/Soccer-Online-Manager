@@ -1,6 +1,8 @@
 from flask import Blueprint
 import sqlalchemy
 from models import City, Country
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 from flask import request, abort, jsonify
 
 cities_bp = Blueprint('cities_bp', __name__)

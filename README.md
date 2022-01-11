@@ -31,15 +31,23 @@ flask db upgrade
 
 ## Resource Endpoint Library
 
+### Email Output
+
+All email output in this documentation is extracted via a Python SMTP Debugging Server.
+
+```bash
+python3 -m smtpd -n -c DebuggingServer localhost:1025
+```
+
 ### Portal
 #### POST `/portal/register`
 ##### Sample Request and Response
 ```bash
-curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Gift","lastname":"Chimphonda","date_of_birth":"2001-11-13","password":"112hfhj@sjjPPPP","email":"gift@gmail.local"}' http://127.0.0.1:5000/portal/register
+curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/register
 ```
 ```json
 {
-  "created": 6,
+  "created": 11,
   "success": true
 }
 ```
@@ -50,21 +58,21 @@ b'Content-Transfer-Encoding: 7bit'
 b'MIME-Version: 1.0'
 b'Subject: Confirm your account.'
 b'From: no-reply@soccermanager.local'
-b'To: gift@gmail.local'
+b'To: k.santos@yahoo.local'
 b'X-Peer: 127.0.0.1'
 b''
-b'Please confirm your account. Your code is 73246.'
-b' The request id is 6.'
+b'Please confirm your account. Your code is 28990.'
+b' The request id is 11.'
 ------------ END MESSAGE ------------
 ```
 #### POST `/portal/confirm/{credential_id}`
 ##### Sample Request and Response
 ```bash
- curl -X POST -H "Content-Type:application/json" -d '{"code":"73246","email":"gift@gmail.local"}' http://127.0.0.1:5000/portal/confirm/6
+ curl -X POST -H "Content-Type:application/json" -d '{"code":"28990","email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/confirm/11
 ```
 ```json
 {
-  "activated": 6,
+  "activated": 11,
   "success": true
 }
 ```

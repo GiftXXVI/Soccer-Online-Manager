@@ -2,6 +2,8 @@ from flask import Blueprint
 from models import Player
 import sqlalchemy
 from flask import request, abort, jsonify
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 
 players_bp = Blueprint('players_bp', __name__)
 

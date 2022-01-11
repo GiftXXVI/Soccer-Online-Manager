@@ -1,5 +1,5 @@
 from flask import Blueprint
-from models import Account, Player, Position, Team
+from models import Credential, Account, Player, Position, Team
 from flask import request, abort, jsonify
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -8,9 +8,9 @@ import sqlalchemy
 accounts_bp = Blueprint('accounts_bp', __name__)
 
 
-#@accounts_bp.route('/accounts', methods=['GET'])
-#@jwt_required()
-#def get_accounts() -> jsonify:
+# @accounts_bp.route('/accounts', methods=['GET'])
+# @jwt_required()
+# def get_accounts() -> jsonify:
 #    '''get a list of accounts'''
 #    accounts = Account.query.all()
 #    accounts_f = [account.format() for account in accounts]
@@ -25,9 +25,10 @@ accounts_bp = Blueprint('accounts_bp', __name__)
 def get_account(account_id) -> jsonify:
     '''get an account by id'''
     identity = get_jwt_identity()
-    credential = Credential.query.filter(Credential.email==identity).one_or_none()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
     account = Account.query.filter(Account.id == account_id).one_or_none()
-    if account.credential_id = credential.id:
+    if account.credential_id == credential.id:
         if account is None:
             abort(404)
         else:
@@ -45,8 +46,9 @@ def get_teams(account_id):
     '''get team associated with account'''
     identity = get_jwt_identity()
     team = Team.query.filter(Team.account_id == account_id).one_or_none()
-    credential = Credential.query.filter(Credential.email==identity).one_or_none()
-    if team.account.credential_id == credential_id:
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    if team.account.credential_id == credential.id:
         return jsonify({
             'success': True,
             'teams': team.format()
@@ -61,11 +63,12 @@ def create_account() -> jsonify:
     '''create account, team and players.'''
     request_body = request.get_json()
     identity = get_jwt_identity()
-    credential = Credential.query.filter(Credential.email=identity).one_or_none()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
     error_state = False
     if request_body is None:
         abort(400)
-    else:        
+    else:
         request_country = request_body.get('country', None)
         if request_country is None:
             abort(400)
@@ -108,7 +111,8 @@ def modify_account(account_id) -> jsonify:
     '''modify an account'''
     request_body = request.get_json()
     identity = get_jwt_identity()
-    credential = Credential.query.filter(Credential.email==identity).one_or_none()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
     error_state = False
     if request_body is None:
         abort(400)
@@ -118,7 +122,7 @@ def modify_account(account_id) -> jsonify:
         if account is None:
             abort(400)
         else:
-            if account.credential_id==credential.id:
+            if account.credential_id == credential.id:
                 try:
                     account.apply()
                 except sqlalchemy.exc.SQLAlchemyError as e:
@@ -143,13 +147,14 @@ def delete_account(account_id) -> jsonify:
     '''delete an account'''
     error_state = False
     identity = get_jwt_identity()
-    credential = Credential.query.filter(Credential.email==identity).one_or_none()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
     account = Account.query.filter(Account.id == account_id).one_or_none()
     if account is None:
         abort(400)
     else:
         try:
-            if account.credential_id==credential.id:
+            if account.credential_id == credential.id:
                 account.delete()
                 account.apply()
             else:

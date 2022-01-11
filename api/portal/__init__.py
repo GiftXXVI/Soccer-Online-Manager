@@ -43,7 +43,7 @@ def create_credential() -> jsonify:
             credential = Credential(firstname=request_firstname,
                                     lastname=request_lastname,
                                     date_of_birth=request_dob,
-                                    email=request_email)
+                                    email=parsed_email)
             credential.setup()
             confirmation_code = Credential.get_confirmation_code()
             credential.confirmation_code = ph.hash(confirmation_code)
@@ -63,7 +63,7 @@ def create_credential() -> jsonify:
                 else:
                     msg = EmailMessage()
                     msg.set_content(
-                        f'Please confirm your account. Your code is {confirmation_code}.\n The request id is {credential.id}.')
+                        f'Please confirm your account. Your code is {confirmation_code[:5]}.\n The request id is {credential.id}.')
                     msg['Subject'] = f'Confirm your account.'
                     msg['From'] = 'no-reply@soccermanager.local'
                     msg['To'] = parsed_email
@@ -77,7 +77,6 @@ def create_credential() -> jsonify:
 
 
 @portal_bp.route('/portal/confirm/<int:credential_id>', methods=['POST'])
-@jwt_required(fresh=True)
 def confirm_credential(credential_id) -> jsonify:
     request_body = request.get_json()
     error_state = False
@@ -115,7 +114,7 @@ def confirm_credential(credential_id) -> jsonify:
                 else:
                     abort(400)
 
-
+#check confirmed before login
 @portal_bp.route('/portal/login', methods=['POST'])
 def issue_token() -> jsonify:
     request_body = request.get_json()
@@ -213,7 +212,7 @@ def reset_password() -> jsonify:
                     else:
                         msg = EmailMessage()
                         msg.set_content(
-                            f'Your password has been reset.\n If you did not initiate this action, use the code {confirmation_code} to set a new password.\n')
+                            f'Your password has been reset.\n If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.\n')
                         msg['Subject'] = f'Your password has been reset.'
                         msg['From'] = 'no-reply@soccermanager.local'
                         msg['To'] = parsed_email
@@ -238,7 +237,7 @@ def reset_password() -> jsonify:
                 finally:
                     msg = EmailMessage()
                     msg.set_content(
-                        f'You have requested a password reset.\n Please use the code {confirmation_code} to set a new password.\n Otherwise, ignore this email.')
+                        f'You have requested a password reset.\n Please use the code {confirmation_code[:5]} to set a new password.\n Otherwise, ignore this email.')
                     msg['Subject'] = f'You have requested a password reset.'
                     msg['From'] = 'no-reply@soccermanager.local'
                     msg['To'] = parsed_email
