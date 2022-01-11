@@ -51,7 +51,7 @@ def create_position() -> jsonify:
                 abort(400)
             else:
                 position = Position(name=request_name,
-                                    initial_players=request_initial_players).one_or_none()
+                                    initial_players=request_initial_players)
                 try:
                     position.insert()
                     position.apply()

@@ -397,7 +397,7 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/70
 ##### Sample Request and Response
 
 ```bash
-curl -X GET http://127.0.0.1:5000/positions
+curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions
 ```
 
 ```json
@@ -407,6 +407,21 @@ curl -X GET http://127.0.0.1:5000/positions
       "id": 1,
       "initial_players": 3,
       "name": "Goalkeeper"
+    },
+    {
+      "id": 4,
+      "initial_players": 6,
+      "name": "Defender"
+    },
+    {
+      "id": 5,
+      "initial_players": 6,
+      "name": "Midfielder"
+    },
+    {
+      "id": 6,
+      "initial_players": 5,
+      "name": "Attacker"
     }
   ],
   "success": true
@@ -418,7 +433,7 @@ curl -X GET http://127.0.0.1:5000/positions
 ##### Sample Request and Response
 
 ```bash
-curl -X GET http://127.0.0.1:5000/positions/1
+ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions/1
 ```
 
 ```json
@@ -437,12 +452,12 @@ curl -X GET http://127.0.0.1:5000/positions/1
 ##### Sample Request and Response
 
 ```bash
-curl -X POST -H 'Content-Type:application/json' -d '{"name":"GoalKeeper","initial_players":"3"}' http://127.0.0.1:5000/positions
+curl -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN" -d '{"name":"GoalKeeper","initial_players":"3"}' http://127.0.0.1:5000/positions
 ```
 
 ```json
 {
-  "created": 1,
+  "created": 7,
   "success": true
 }
 ```
@@ -452,12 +467,13 @@ curl -X POST -H 'Content-Type:application/json' -d '{"name":"GoalKeeper","initia
 ##### Sample Request and Response
 
 ```bash
-curl -X PATCH -H 'Content-Type:application/json' -d '{"name":"Goalkeeper","initial_players":"3"}' http://127.0.0.1:5000/positions/1
+curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN" -d '{"name":"GoalKeeper1","initial_players":"3"}'
+ http://127.0.0.1:5000/positions/7
 ```
 
 ```json
 {
-  "modified": 1,
+  "modified": 7,
   "success": true
 }
 ```
@@ -467,12 +483,12 @@ curl -X PATCH -H 'Content-Type:application/json' -d '{"name":"Goalkeeper","initi
 ##### Sample Request and Response
 
 ```bash
-curl -X DELETE http://127.0.0.1:5000/positions/2
+curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions/7
 ```
 
 ```json
 {
-  "deleted": 2,
+  "deleted": 7,
   "success": true
 }
 ```
