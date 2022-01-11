@@ -45,6 +45,10 @@ python3 -m smtpd -n -c DebuggingServer localhost:8025
 ```bash
 curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/register
 ```
+Or with an optional role parameter:
+```bash
+curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"gift.chimphonda@gmail.local","password":";;87^child^BORROW^each^04;;","role":1}' http://127.0.0.1:5000/portal/register
+```
 ```json
 {
   "created": 50,
@@ -193,7 +197,7 @@ b' 12216 to set a new password.'
 ##### Sample Request and Response
 
 ```bash
-curl http://127.0.0.1:5000/countries
+curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries
 ```
 
 ```json
@@ -213,14 +217,14 @@ curl http://127.0.0.1:5000/countries
 ##### Sample Request and Response
 
 ```bash
-curl http://127.0.0.1:5000/countries/1
+curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries/54
 ```
 
 ```json
 {
   "country": {
-    "id": 1,
-    "name": "Malawi"
+    "id": 54,
+    "name": "Mozambique"
   },
   "success": true
 }
@@ -231,12 +235,12 @@ curl http://127.0.0.1:5000/countries/1
 ##### Sample Request and Response
 
 ```bash
-curl -X POST -H 'Content-Type:application/json' -d '{"name":"Malawi"}' http://127.0.0.1:5000/countries
+curl -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN" -d '{"name":"New Zealand"}' http://127.0.0.1:5000/countries
 ```
 
 ```json
 {
-  "created": 1,
+  "created": 58,
   "success": true
 }
 ```
@@ -246,12 +250,12 @@ curl -X POST -H 'Content-Type:application/json' -d '{"name":"Malawi"}' http://12
 ##### Sample Request and Response
 
 ```bash
-curl -X PATCH -H 'Content-Type:application/json' -d '{"name":"Kingdom of Eswatini"}' http://127.0.0.1:5000/countries/3
+curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN" -d '{"name":"Malawi"}' http://127.0.0.1:5000/countries/1
 ```
 
 ```json
 {
-  "modified": 3,
+  "modified": 1,
   "success": true
 }
 ```
@@ -261,12 +265,12 @@ curl -X PATCH -H 'Content-Type:application/json' -d '{"name":"Kingdom of Eswatin
 ##### Sample Request and Response
 
 ```bash
-curl -X DELETE http://127.0.0.1:5000/countries/2
+ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries/59
 ```
 
 ```json
 {
-  "deleted": 2,
+  "deleted": 59,
   "success": true
 }
 ```

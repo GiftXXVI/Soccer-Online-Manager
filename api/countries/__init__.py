@@ -1,7 +1,7 @@
 from flask import Blueprint
 import sqlalchemy
 from models import Country, City
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from flask_jwt_extended import jwt_required
 from flask import request, abort, jsonify
 
@@ -53,7 +53,7 @@ def create_country() -> jsonify:
     request_body = request.get_json()
     error_state = False
     claims = get_jwt()
-    if claims['sm_role']==1:
+    if claims['sm_role'] == 1:
         if request_body is None:
             abort(400)
         else:
@@ -88,7 +88,8 @@ def modify_country(country_id) -> jsonify:
     '''modify a country name'''
     request_body = request.get_json()
     error_state = False
-    if claims['sm_role']==1:
+    claims = get_jwt()
+    if claims['sm_role'] == 1:
         if request_body is None:
             abort(400)
         else:
@@ -125,7 +126,8 @@ def modify_country(country_id) -> jsonify:
 def delete_country(country_id) -> jsonify:
     '''delete a country'''
     error_state = False
-    if claims['sm_role']==1:
+    claims = get_jwt()
+    if claims['sm_role'] == 1:
         country = Country.query.filter(Country.id == country_id).one_or_none()
         if country is None:
             abort(400)

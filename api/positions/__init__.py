@@ -2,7 +2,7 @@ from flask import Blueprint
 import sqlalchemy
 from models import Position
 from flask import request, abort, jsonify
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from flask_jwt_extended import jwt_required
 
 positions_bp = Blueprint('positions_bp', __name__)
@@ -40,7 +40,8 @@ def create_position() -> jsonify:
     '''create a position'''
     request_body = request.get_json()
     error_state = False
-    if claims['sm_role']==1:
+    claims = get_jwt()
+    if claims['sm_role'] == 1:
         if request_body is None:
             abort(400)
         else:
@@ -77,7 +78,8 @@ def modify_position(position_id) -> jsonify:
     '''modify a position name and initial players'''
     request_body = request.get_json()
     error_state = False
-    if claims['sm_role']==1:
+    claims = get_jwt()
+    if claims['sm_role'] == 1:
         if request_body is None:
             abort(400)
         else:
@@ -110,13 +112,16 @@ def modify_position(position_id) -> jsonify:
     else:
         abort(401)
 
+
 @positions_bp.route('/positions/<int:position_id>', methods=['DELETE'])
 @jwt_required()
 def delete_position(position_id) -> jsonify:
     '''delete a position'''
     error_state = False
-    if claims['sm_role']==1:
-        position = Position.query.filter(Position.id == position_id).one_or_none()
+    claims = get_jwt()
+    if claims['sm_role'] == 1:
+        position = Position.query.filter(
+            Position.id == position_id).one_or_none()
         if position is None:
             abort(400)
         else:
