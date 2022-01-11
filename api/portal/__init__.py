@@ -1,4 +1,6 @@
 from argon2 import PasswordHasher, Type
+import argon2
+from argon2.low_level import error_to_str
 from flask import Blueprint
 from models import Credential
 import sqlalchemy
@@ -10,7 +12,7 @@ from flask_jwt_extended import JWTManager
 from email.utils import parseaddr
 import smtplib
 from email.message import EmailMessage
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 ph = PasswordHasher()
 
@@ -61,13 +63,19 @@ def create_credential() -> jsonify:
                 if error_state:
                     abort(500)
                 else:
+                    now = datetime.now()
                     msg = EmailMessage()
                     msg.set_content(
-                        f'Please confirm your account. Your code is {confirmation_code[:5]}.\n The request id is {credential.id}.')
-                    msg['Subject'] = f'Confirm your account.'
+                        f'''Your account has been created at {now.strftime("%Y-%m-%d %H:%M:%S")}.
+                        The request id is {credential.id}.
+                        You are required confirm your email address.
+                        The confirmation code is {confirmation_code[:5]}.
+                        '''
+                    )
+                    msg['Subject'] = f'Please confirm your email address.'
                     msg['From'] = 'no-reply@soccermanager.local'
                     msg['To'] = parsed_email
-                    s = smtplib.SMTP(host='localhost', port=1025)
+                    s = smtplib.SMTP(host='localhost', port=8025)
                     s.send_message(msg)
                     s.quit()
                     return jsonify({
@@ -92,29 +100,31 @@ def confirm_credential(credential_id) -> jsonify:
             if credential is None:
                 abort(400)
             else:
-                if ph.verify(credential.confirmation_code, Credential.get_confirmation_code(code=request_code)):
+                try:
+                    ph.verify(credential.confirmation_code, Credential.get_confirmation_code(
+                        code=request_code))
                     if ph.check_needs_rehash(credential.confirmation_code):
                         ph.hash(request_code)
-                    try:
-                        credential.activate()
-                        credential.apply()
-                        credential.refresh()
-                    except sqlalchemy.exc.SQLAlchemyError as e:
-                        credential.rollback()
-                        error_state = True
-                    finally:
-                        credential.dispose()
-                        if error_state:
-                            abort(500)
-                        else:
-                            return jsonify({
-                                'success': True,
-                                'activated': credential.id
-                            })
-                else:
-                    abort(400)
+                    credential.activate()
+                    credential.apply()
+                    credential.refresh()
+                except sqlalchemy.exc.SQLAlchemyError as e:
+                    credential.rollback()
+                    error_state = True
+                except argon2.exceptions.VerifyMismatchError:
+                    error_state = True
+                    abort(401)
+                finally:
+                    credential.dispose()
+                    if error_state:
+                        abort(500)
+                    else:
+                        return jsonify({
+                            'success': True,
+                            'activated': credential.id
+                        })
 
-#check confirmed before login
+
 @portal_bp.route('/portal/login', methods=['POST'])
 def issue_token() -> jsonify:
     request_body = request.get_json()
@@ -132,7 +142,8 @@ def issue_token() -> jsonify:
             if credential is None:
                 abort(401)
             else:
-                if ph.verify(credential.challenge, request_challenge):
+                try:
+                    ph.verify(credential.challenge, request_challenge)
                     if ph.check_needs_rehash(credential.challenge):
                         ph.hash(request_challenge)
                     if credential.active and not credential.reset_required:
@@ -144,12 +155,13 @@ def issue_token() -> jsonify:
                         })
                     else:
                         abort(401)
-                else:
+                except argon2.exceptions.VerifyMismatchError:
+                    error_state = True
                     abort(401)
 
 
 @portal_bp.route('/portal/refresh', methods=['POST'])
-@jwt_required(fresh=True)
+@jwt_required()
 def refresh_token() -> jsonify:
     request_body = request.get_json()
     if request_body is None:
@@ -196,13 +208,11 @@ def reset_password() -> jsonify:
                     request_old_password is not None:
 
                 try:
-                    if ph.verify(credential.challenge, request_old_password):
-                        credential.challenge = ph.hash(request_password)
-                        credential.confirmation_code = ph.hash(
-                            confirmation_code)
-                        credential.apply()
-                    else:
-                        abort(401)
+                    ph.verify(credential.challenge, request_old_password)
+                    credential.challenge = ph.hash(request_password)
+                    credential.confirmation_code = ph.hash(
+                        confirmation_code)
+                    credential.apply()
                 except sqlalchemy.exc.SQLAlchemyError as e:
                     credential.rollback()
                     error_state = True
@@ -210,13 +220,15 @@ def reset_password() -> jsonify:
                     if error_state:
                         abort(500)
                     else:
+                        now = datetime.now()
                         msg = EmailMessage()
                         msg.set_content(
-                            f'Your password has been reset.\n If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.\n')
+                            f'''Your password has been reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.
+                            If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.''')
                         msg['Subject'] = f'Your password has been reset.'
                         msg['From'] = 'no-reply@soccermanager.local'
                         msg['To'] = parsed_email
-                        s = smtplib.SMTP(host='localhost', port=1025)
+                        s = smtplib.SMTP(host='localhost', port=8025)
                         s.send_message(msg)
                         s.quit()
                         return jsonify({
@@ -235,13 +247,16 @@ def reset_password() -> jsonify:
                     credential.rollback()
                     error_state = True
                 finally:
+                    now = datetime.now()
                     msg = EmailMessage()
                     msg.set_content(
-                        f'You have requested a password reset.\n Please use the code {confirmation_code[:5]} to set a new password.\n Otherwise, ignore this email.')
+                        f'''You have requested a password reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.
+                        Please use the code {confirmation_code[:5]} to set a new password.
+                        Otherwise, ignore this email.''')
                     msg['Subject'] = f'You have requested a password reset.'
                     msg['From'] = 'no-reply@soccermanager.local'
                     msg['To'] = parsed_email
-                    s = smtplib.SMTP(host='localhost', port=1025)
+                    s = smtplib.SMTP(host='localhost', port=8025)
                     s.send_message(msg)
                     s.quit()
                     return jsonify({
@@ -252,7 +267,7 @@ def reset_password() -> jsonify:
                 abort(400)
 
 
-@portal_bp.route('/portal/confirm_reset', methods=['PATCH'])
+@portal_bp.route('/portal/setpassword', methods=['PATCH'])
 def confirm_reset_password() -> jsonify:
     request_body = request.get_json()
     error_state = False
@@ -260,7 +275,7 @@ def confirm_reset_password() -> jsonify:
         abort(400)
     else:
         request_email = request_body.get('email', None)
-        request_challenge = request_body.get('password')
+        request_challenge = request_body.get('password', None)
         request_code = request_body.get('code', None)
         parsed_email = parseaddr(request_email)[1]
         if request_email is not None and \
@@ -269,28 +284,38 @@ def confirm_reset_password() -> jsonify:
                 and request_code is not None:
             credential = Credential.query.filter(
                 Credential.email == parsed_email).one_or_none()
-
             if credential is None:
-                abort(400)
-
-            if ph.verify(credential.confirmation_code, Credential.get_confirmation_code(request_code)):
+                abort(401)
+            try:
+                ph.verify(credential.confirmation_code,
+                          Credential.get_confirmation_code(request_code))
                 credential.challenge = ph.hash(request_challenge)
-                try:
-                    credential.apply()
-                except sqlalchemy.exc.SQLAlchemyError as e:
-                    credential.rollback()
-                    error_state = True
-                finally:
-                    credential.dispose()
-                    if error_state:
-                        abort(400)
-                    else:
-                        msg = EmailMessage()
-                        msg.set_content(
-                            f'Your password has been reset.\n If you did not initiate this action, please reset your password.\n')
-                        msg['Subject'] = f'Your password has been reset.'
-                        msg['From'] = 'no-reply@soccermanager.local'
-                        msg['To'] = parsed_email
-                        s = smtplib.SMTP(host='localhost', port=1025)
-                        s.send_message(msg)
-                        s.quit()
+                credential.confirmation_code = ph.hash(
+                    Credential.get_confirmation_code())
+                credential.apply()
+            except sqlalchemy.exc.SQLAlchemyError as e:
+                credential.rollback()
+                error_state = True
+            except argon2.exceptions.VerifyMismatchError:
+                error_state = True
+            finally:
+                id = credential.id
+                credential.dispose()
+                if error_state:
+                    abort(500)
+                else:
+                    now = datetime.now()
+                    msg = EmailMessage()
+                    msg.set_content(
+                        f'''Your password has been reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.
+                        If you did not initiate this action, please reset your password.''')
+                    msg['Subject'] = f'Your password has been reset.'
+                    msg['From'] = 'no-reply@soccermanager.local'
+                    msg['To'] = parsed_email
+                    s = smtplib.SMTP(host='localhost', port=8025)
+                    s.send_message(msg)
+                    s.quit()
+                    return jsonify({
+                        'success': True,
+                        'reset': id
+                    })

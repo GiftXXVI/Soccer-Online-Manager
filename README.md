@@ -36,7 +36,7 @@ flask db upgrade
 All email output in this documentation is extracted via a Python SMTP Debugging Server.
 
 ```bash
-python3 -m smtpd -n -c DebuggingServer localhost:1025
+python3 -m smtpd -n -c DebuggingServer localhost:8025
 ```
 
 ### Portal
@@ -47,7 +47,7 @@ curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","last
 ```
 ```json
 {
-  "created": 11,
+  "created": 48,
   "success": true
 }
 ```
@@ -56,51 +56,137 @@ curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","last
 b'Content-Type: text/plain; charset="utf-8"'
 b'Content-Transfer-Encoding: 7bit'
 b'MIME-Version: 1.0'
-b'Subject: Confirm your account.'
+b'Subject: Please confirm your email address.'
 b'From: no-reply@soccermanager.local'
 b'To: k.santos@yahoo.local'
 b'X-Peer: 127.0.0.1'
 b''
-b'Please confirm your account. Your code is 28990.'
-b' The request id is 11.'
+b'Your account has been created at 2022-01-11 07:45:21.'
+b'                        The request id is 48.'
+b'                        You are required confirm your email address.'
+b'                        The confirmation code is 24893.'
+b'                        '
 ------------ END MESSAGE ------------
 ```
 #### POST `/portal/confirm/{credential_id}`
 ##### Sample Request and Response
 ```bash
- curl -X POST -H "Content-Type:application/json" -d '{"code":"28990","email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/confirm/11
+curl -X POST -H "Content-Type:application/json" -d '{"code":"24893","email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/
+confirm/48
 ```
 ```json
 {
-  "activated": 11,
+  "activated": 48,
   "success": true
 }
 ```
 #### POST `/portal/login`
 #### Sample Request and Response
 ```bash
-curl -X POST -H "Content-Type:application/json" -d '{"email":"gift@gmail.local","password":"112hfhj@sjjPPPP"}' http://127.0.0.1:5000/portal/login
+curl -X POST -H "Content-Type:application/json" -d '{"email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/login
 ```
 ```json
 {
   "success": true,
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxNzgyNTQ2LCJqdGkiOiI4MGI3ZjFiYi0xM2Y0LTRhMjEtYTZlNy05YzMzMDA5NGNjMTkiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZ2lmdEBnbWFpbC5sb2NhbCIsIm5iZiI6MTY0MTc4MjU0NiwiZXhwIjoxNjQxNzg2MTQ2fQ.dJDs8aFx41JGvbNvfqI04-h8rw3fwcQuQaPVGrj6u4Q"
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxODgwMDcwLCJqdGkiOiI3OWEyMjY3Yy1hNmEyLTQ5YzYtOTQ1My04Y2FmMGJmN2ZmM2QiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiay5zYW50b3NAeWFob28ubG9jYWwiLCJuYmYiOjE2NDE4ODAwNzAsImV4cCI6MTY0MTg4MzY3MH0.FqF_xGJLGxvfQ7Ak3V0By84JZAa9-7pfPkEmgbhdrD0"
 }
 ```
 #### POST `/portal/refresh`
 ##### Sample Refresh and Response
 ```bash
-export TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjQxNzgyNTQ2LCJqdGkiOiI4MGI3ZjFiYi0xM2Y0LTRhMjEtYTZlNy05YzMzMDA5NGNjMTkiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZ2lmdEBnbWFpbC5sb2NhbCIsIm5iZiI6MTY0MTc4MjU0NiwiZXhwIjoxNjQxNzg2MTQ2fQ.dJDs8aFx41JGvbNvfqI04-h8rw3fwcQuQaPVGrj6u4Q
+export TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY0MTg4MDE0MiwianRpIjoiOTFjYzllN2MtNzg5ZC00YWZlLWFjNDAtZDY1NzE0MDZkNzY0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imsuc2FudG9zQHlhaG9vLmxvY2FsIiwibmJmIjoxNjQxODgwMTQyLCJleHAiOjE2NDE4ODM3NDJ9.MlNture4K-4PwUv4Zy5j7wP8jXeXwS4C5lZmgjCaS3s
 ```
 ```bash
- curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"gift@gmail.local","token":"$TOKEN"}' http://127.0.0.1:5000/portal/refresh
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local","token":"$TOKEN"}' http://127.0.0.1:5000/portal/refresh
 ```
 ```json
 {
   "success": true,
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY0MTc4Mjk0MywianRpIjoiMzJkZmQyOGUtMTNmOC00MTljLWI4ZGYtYWFjODk0NTM4YTMyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImdpZnRAZ21haWwubG9jYWwiLCJuYmYiOjE2NDE3ODI5NDMsImV4cCI6MTY0MTc4NjU0M30.9HX_ZBbMQJ4TRmHnFd6Yau7q_l3WoUqbdhjC_VBFbkM"
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY0MTg4MDE0MiwianRpIjoiOTFjYzllN2MtNzg5ZC00YWZlLWFjNDAtZDY1NzE0MDZkNzY0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imsuc2FudG9zQHlhaG9vLmxvY2FsIiwibmJmIjoxNjQxODgwMTQyLCJleHAiOjE2NDE4ODM3NDJ9.MlNture4K-4PwUv4Zy5j7wP8jXeXwS4C5lZmgjCaS3s"
 }
 ```
+#### PATCH `/portal/reset`
+##### Sample Refresh and Response
+###### Option 1: Provide Only Email
+Step 1
+
+```bash
+curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/reset
+```
+```bash
+---------- MESSAGE FOLLOWS ----------
+b'Content-Type: text/plain; charset="utf-8"'
+b'Content-Transfer-Encoding: 7bit'
+b'MIME-Version: 1.0'
+b'Subject: You have requested a password reset.'
+b'From: no-reply@soccermanager.local'
+b'To: k.santos@yahoo.local'
+b'X-Peer: 127.0.0.1'
+b''
+b'You have requested a password reset at 2022-01-11 07:50:27.'
+b'                        Please use the code 55209 to set a new password.'
+b'                        Otherwise, ignore this email.'
+------------ END MESSAGE ------------
+```
+```json
+{
+  "reset": 48,
+  "success": true
+}
+```
+Step 2
+```bash
+curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local","password":"C74LptkFL4seJZYQ", "code":"55209"}' http://127.0.0.1:5000/portal/setpassword
+```
+```bash
+---------- MESSAGE FOLLOWS ----------
+b'Content-Type: text/plain; charset="utf-8"'
+b'Content-Transfer-Encoding: quoted-printable'
+b'MIME-Version: 1.0'
+b'Subject: Your password has been reset.'
+b'From: no-reply@soccermanager.local'
+b'To: k.santos@yahoo.local'
+b'X-Peer: 127.0.0.1'
+b''
+b'Your password has been reset at 2022-01-11 07:51:32.'
+b'                        If you did not initiate this action, please reset you='
+b'r password.'
+------------ END MESSAGE ------------
+```
+```json
+{
+  "reset": 48,
+  "success": true
+}
+```
+
+##### Option 2:Provide email and password
+```bash
+curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local", "password":"
+Evn.ta]9zxP&#Wut", "old_password":"C74LptkFL4seJZYQ"}' http://127.0.0.1:5000/portal/reset
+```
+```bash
+---------- MESSAGE FOLLOWS ----------
+b'Content-Type: text/plain; charset="utf-8"'
+b'Content-Transfer-Encoding: quoted-printable'
+b'MIME-Version: 1.0'
+b'Subject: Your password has been reset.'
+b'From: no-reply@soccermanager.local'
+b'To: k.santos@yahoo.local'
+b'X-Peer: 127.0.0.1'
+b''
+b'Your password has been reset at 2022-01-11 07:57:25.'
+b'                            If you did not initiate this action, use the code='
+b' 61119 to set a new password.'
+------------ END MESSAGE ------------
+```
+```json
+{
+  "reset": 48,
+  "success": true
+}
+```
+
 ### Countries
 
 #### GET `/countries`
