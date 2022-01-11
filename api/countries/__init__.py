@@ -52,53 +52,20 @@ def create_country() -> jsonify:
     '''create a country'''
     request_body = request.get_json()
     error_state = False
-    if request_body is None:
-        abort(400)
-    else:
-        request_name = request_body.get('name', None)
-        if request_name is None:
+    claims = get_jwt()
+    if claims['sm_role']==1:
+        if request_body is None:
             abort(400)
         else:
-            country = Country(name=request_name)
-            try:
-                country.insert()
-                country.apply()
-                country.refresh()
-            except sqlalchemy.exc.SQLAlchemyError as e:
-                country.rollback()
-                error_state = True
-            finally:
-                country.dispose()
-                if error_state:
-                    abort(500)
-                else:
-                    return jsonify({
-                        'success': True,
-                        'created': country.id
-                    })
-
-
-@countries_bp.route('/countries/<int:country_id>', methods=['PATCH'])
-@jwt_required()
-def modify_country(country_id) -> jsonify:
-    '''modify a country name'''
-    request_body = request.get_json()
-    error_state = False
-    if request_body is None:
-        abort(400)
-    else:
-        request_name = request_body.get('name', None)
-        if request_name is None:
-            abort(400)
-        else:
-            country = Country.query.filter(
-                Country.id == country_id).one_or_none()
-            if country is None:
+            request_name = request_body.get('name', None)
+            if request_name is None:
                 abort(400)
             else:
+                country = Country(name=request_name)
                 try:
-                    country.name = request_name
+                    country.insert()
                     country.apply()
+                    country.refresh()
                 except sqlalchemy.exc.SQLAlchemyError as e:
                     country.rollback()
                     error_state = True
@@ -109,8 +76,48 @@ def modify_country(country_id) -> jsonify:
                     else:
                         return jsonify({
                             'success': True,
-                            'modified': country_id
+                            'created': country.id
                         })
+    else:
+        abort(401)
+
+
+@countries_bp.route('/countries/<int:country_id>', methods=['PATCH'])
+@jwt_required()
+def modify_country(country_id) -> jsonify:
+    '''modify a country name'''
+    request_body = request.get_json()
+    error_state = False
+    if claims['sm_role']==1:
+        if request_body is None:
+            abort(400)
+        else:
+            request_name = request_body.get('name', None)
+            if request_name is None:
+                abort(400)
+            else:
+                country = Country.query.filter(
+                    Country.id == country_id).one_or_none()
+                if country is None:
+                    abort(400)
+                else:
+                    try:
+                        country.name = request_name
+                        country.apply()
+                    except sqlalchemy.exc.SQLAlchemyError as e:
+                        country.rollback()
+                        error_state = True
+                    finally:
+                        country.dispose()
+                        if error_state:
+                            abort(500)
+                        else:
+                            return jsonify({
+                                'success': True,
+                                'modified': country_id
+                            })
+    else:
+        abort(401)
 
 
 @countries_bp.route('/countries/<int:country_id>', methods=['DELETE'])
@@ -118,22 +125,25 @@ def modify_country(country_id) -> jsonify:
 def delete_country(country_id) -> jsonify:
     '''delete a country'''
     error_state = False
-    country = Country.query.filter(Country.id == country_id).one_or_none()
-    if country is None:
-        abort(400)
+    if claims['sm_role']==1:
+        country = Country.query.filter(Country.id == country_id).one_or_none()
+        if country is None:
+            abort(400)
+        else:
+            try:
+                country.delete()
+                country.apply()
+            except sqlalchemy.exc.SQLAlchemyError as e:
+                country.rollback()
+                error_state = True
+            finally:
+                country.dispose()
+                if error_state:
+                    abort(500)
+                else:
+                    return jsonify({
+                        'success': True,
+                        'deleted': country_id
+                    })
     else:
-        try:
-            country.delete()
-            country.apply()
-        except sqlalchemy.exc.SQLAlchemyError as e:
-            country.rollback()
-            error_state = True
-        finally:
-            country.dispose()
-            if error_state:
-                abort(500)
-            else:
-                return jsonify({
-                    'success': True,
-                    'deleted': country_id
-                })
+        abort(401)
