@@ -2,6 +2,7 @@ import os
 import decimal
 from random import choice
 
+roles = {0:"Normal User",1:"Super User"}
 
 def get_db_uri() -> str:
     if os.getenv('APP_MODE') == 'LIVE':

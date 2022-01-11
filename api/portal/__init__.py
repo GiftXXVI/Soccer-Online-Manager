@@ -147,8 +147,9 @@ def issue_token() -> jsonify:
                     if ph.check_needs_rehash(credential.challenge):
                         ph.hash(request_challenge)
                     if credential.active and not credential.reset_required:
+                        claims = {'sm_role':credential.role}
                         token = create_access_token(
-                            identity=request_email, expires_delta=timedelta(minutes=60), fresh=True)
+                            identity=request_email, expires_delta=timedelta(minutes=60), fresh=True, additional_claims:claims)
                         return jsonify({
                             'success': True,
                             'token': token
@@ -174,8 +175,9 @@ def refresh_token() -> jsonify:
         else:
             identity = get_jwt_identity()
             if request_email == identity:
+                claims = {'sm_role':credential.role}
                 token = create_access_token(
-                    identity=identity, expires_delta=timedelta(minutes=60), fresh=False)
+                    identity=identity, expires_delta=timedelta(minutes=60), fresh=False,additional_claims=claims)
                 return jsonify({
                     'success': True,
                     'token': token
