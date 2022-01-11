@@ -8,16 +8,21 @@ import sqlalchemy
 accounts_bp = Blueprint('accounts_bp', __name__)
 
 
-# @accounts_bp.route('/accounts', methods=['GET'])
-# @jwt_required()
-# def get_accounts() -> jsonify:
-#    '''get a list of accounts'''
-#    accounts = Account.query.all()
-#    accounts_f = [account.format() for account in accounts]
-#    return jsonify({
-#        'success': True,
-#        'accounts': accounts_f
-#    })
+@accounts_bp.route('/accounts', methods=['GET'])
+@jwt_required()
+def get_accounts() -> jsonify:
+    '''get a list of accounts'''
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    if claims['sm_role']==1:
+        accounts = Account.query.all()
+        accounts_f = [account.format() for account in accounts]
+        return jsonify({
+            'success': True,
+            'accounts': accounts_f
+        })
+    else:
+        abort(401)
 
 
 @accounts_bp.route('/accounts/<int:account_id>', methods=['GET'])
