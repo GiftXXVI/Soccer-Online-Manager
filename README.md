@@ -226,7 +226,6 @@ b' 12216 to set a new password.'
 ### Countries
 
 #### GET `/countries`
-
 ##### Sample Request and Response
 
 ```bash
@@ -246,7 +245,6 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries
 ```
 
 #### GET `/countries/{country_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -264,7 +262,6 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries/54
 ```
 
 #### POST `/countries`
-
 ##### Sample Request and Response
 
 ```bash
@@ -279,7 +276,6 @@ curl -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN"
 ```
 
 #### PATCH `/countries/{country_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -294,7 +290,6 @@ curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN
 ```
 
 #### DELETE `/countries/{country_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -311,7 +306,6 @@ curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN
 ### Cities
 
 #### GET `/cities/{city_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -331,7 +325,6 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/1
 ```
 
 #### GET `/cities`
-
 ##### Sample Request and Response
 
 ```bash
@@ -377,7 +370,6 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/1
 ```
 
 #### POST `/cities`
-
 ##### Sample Request and Response
 
 ```bash
@@ -393,8 +385,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/1
 ```
 
 #### PATCH `/cities/{city_id}`
-
-#### Sample Request and Response
+##### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"name":"Maputo","country_id":54}' http://127
@@ -409,8 +400,7 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 ```
 
 #### DELETE `/cities/{city_id}`
-
-#### Sample Request and Response
+##### Sample Request and Response
 
 ```bash
 curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/70
@@ -426,7 +416,6 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/70
 ### Positions
 
 #### GET `/positions`
-
 ##### Sample Request and Response
 
 ```bash
@@ -462,7 +451,6 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions
 ```
 
 #### GET `/positions/{position_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -481,7 +469,6 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions
 ```
 
 #### POST `/positions`
-
 ##### Sample Request and Response
 
 ```bash
@@ -496,7 +483,6 @@ curl -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN"
 ```
 
 #### PATCH `/positions/{position_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -512,7 +498,6 @@ curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN
 ```
 
 #### DELETE `/positions/{position_id}`
-
 ##### Sample Request and Response
 
 ```bash
@@ -529,6 +514,7 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions/
 ### Accounts
 
 #### GET `/accounts`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/accounts
@@ -551,7 +537,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/accounts
 ```
 
 #### GET `/accounts/{account_id}`
-
+##### Sample Request and Response
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18
 ```
@@ -567,6 +553,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18
 ```
 
 #### GET `/accounts/{account_id}/teams/`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18/teams
@@ -588,7 +575,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18/
 ```
 
 #### POST `/accounts`
-
+##### Sample Request and Response
 ```bash
 curl -X POST -H "Authorization:Bearer $TOKEN2" -H "Content-Type:application/json" -d '{"country":14,"nickname":"slayer102"}' http://127.0.0.1:5000/accounts
 ```
@@ -601,6 +588,7 @@ curl -X POST -H "Authorization:Bearer $TOKEN2" -H "Content-Type:application/json
 ```
 
 #### PATCH `/accounts`
+##### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"nickname":"the_urge22"}' http://127.0.0.1:
@@ -617,6 +605,7 @@ curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/jso
 ### Teams
 
 #### GET `/teams`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams
@@ -651,6 +640,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams
 ```
 
 #### GET `/teams/{team_id}`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams/8
@@ -673,6 +663,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams/8
 ```
 
 #### GET `/teams/{team_id}/players`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/teams/9/players
@@ -947,6 +938,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/teams/9/play
 ```
 
 #### PATCH `/team/{team_id}`
+##### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN2" -d '{"name":"Lucerne Vikings"}' http://127.0.0.1
@@ -963,6 +955,7 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 ### Players
 
 #### GET `/players`
+##### Sample Request and Response
 
 ```bash
  curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/players
@@ -1094,6 +1087,7 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 ```
 
 #### GET `/players/{player_id}`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
@@ -1119,6 +1113,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
 ```
 
 #### PATCH `/players/{player_id}`
+##### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Rudolfo","lastname":"Oliveira"
@@ -1135,6 +1130,7 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 ### Transfers
 
 #### GET `/transfers`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
@@ -1160,6 +1156,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
 ```
 
 #### GET `/transfers/state/{state_id}`
+##### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/state/0
@@ -1185,6 +1182,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/st
 ```
 
 #### POST `/transfers`
+##### Sample Request and Response
 
 ```bash
 curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"player_id":"140","from_team_id":"9","transfer_value":1500000}' http://127.0.0.1:5000/transfers
@@ -1198,6 +1196,7 @@ curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1
 ```
 
 #### PATCH `/transfers`
+##### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1750000"}' http://127.0.0.1:5000/transfers/3
@@ -1211,6 +1210,7 @@ curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/jso
 ```
 
 #### DELETE `/transfers`
+##### Sample Request and Response
 
 ```bash
 curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/transfers/3
