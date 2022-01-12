@@ -234,7 +234,7 @@ class Transfer(db.Model, OnlineManagerModel):
     from_team_id = db.Column(db.Integer(), db.ForeignKey(
         'team.id'), nullable=False)
     to_team_id = db.Column(db.Integer(), db.ForeignKey(
-        'team.id'), nullable=False)
+        'team.id'), nullable=True)
     transfer_value = db.Column(db.Numeric(), nullable=False)
     value_increase = db.Column(db.Integer(), nullable=True)
     date_listed = db.Column(db.DateTime(), nullable=False)

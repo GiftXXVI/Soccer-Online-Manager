@@ -1121,3 +1121,58 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
   "success": true
 }
 ```
+### Transfers
+#### GET `/transfers`
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
+```
+```json
+{
+  "accounts": [
+    {
+      "date_completed": null,
+      "date_listed": "Wed, 12 Jan 2022 07:40:34 GMT",
+      "from_team_id": 9,
+      "id": 3,
+      "player": "Rudolfo Oliveira",
+      "player_id": 140,
+      "to_team_id": null,
+      "transfer_value": "1500000",
+      "value_increase": null
+    }
+  ],
+  "success": true
+}
+```
+#### GET `/transfers/state/{state_id}`
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/state/0
+```
+```json
+{
+  "accounts": [
+    {
+      "date_completed": null,
+      "date_listed": "Wed, 12 Jan 2022 07:40:34 GMT",
+      "from_team_id": 9,
+      "id": 3,
+      "player": "Rudolfo Oliveira",
+      "player_id": 140,
+      "to_team_id": null,
+      "transfer_value": "1500000",
+      "value_increase": null
+    }
+  ],
+  "success": true
+}
+```
+#### POST `/transfers/`
+```bash
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"player_id":"140","from_team_id":"9","transfer_value":1500000}' http://127.0.0.1:5000/transfers
+```
+```json
+{
+  "created": 3,
+  "success": true
+}
+```
