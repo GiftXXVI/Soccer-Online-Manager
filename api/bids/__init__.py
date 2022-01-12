@@ -1,5 +1,6 @@
 from flask import Blueprint
-from models import Transfer, Bid
+from models import Credential, Account, Transfer
+from models import Bid, Team
 from flask import request, abort, jsonify
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -12,10 +13,24 @@ bids_bp = Blueprint('bids_bp', __name__)
 # bidder
 
 
-@bids_bp.route('/teams/<int:team_id>/bids', methods=['GET'])
+@bids_bp.route('/bids/<int:selected>', methods=['GET'])
 @jwt_required()
-def get_team_bids(team_id):
-    bids = Bid.query.filter(Bid.team_id == team_id).all()
+def get_team_bids(selected):
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
+    if selected == 0:
+        bids = Bid.query.filter(Bid.team_id == team.id,
+                                Bid.selected == True).all()
+    elif selected == 1:
+        bids = Bid.query.filter(Bid.team_id == team.id,
+                                Bid.selected != True).all()
+    else:
+        bids = Bid.query.filter(Bid.team_id == team.id).all()
+
     bids_f = [bid.format() for bid in bids]
     return jsonify({
         'success': True,
@@ -28,12 +43,22 @@ def get_team_bids(team_id):
 @bids_bp.route('/transfers/<int:transfer_id>/bids', methods=['GET'])
 @jwt_required()
 def get_transfer_bids(transfer_id):
-    bids = Bid.query.filter(Bid.transfer_id == transfer_id).all()
-    bids_f = [bid.format() for bid in bids]
-    return jsonify({
-        'success': True,
-        'bids': bids_f
-    })
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
+    transfer = Transfer.query.filter(Transfer.id == transfer_id).one_or_none()
+    if transfer.player.team_id == team.id:
+        bids = Bid.query.filter(Bid.transfer_id == transfer_id).all()
+        bids_f = [bid.format() for bid in bids]
+        return jsonify({
+            'success': True,
+            'bids': bids_f
+        })
+    else:
+        abort(401)
 
 
 @bids_bp.route('/transfers/<int:transfer_id>/bids', methods=['POST'])
@@ -139,3 +164,8 @@ def select_bid(transfer_id) -> jsonify:
                     'success': True,
                     'modified': transfer.id
                 })
+
+@bids_bp.route('/bids/<int:bid_id>', methods=['DELETE'])
+@jwt_required()
+def delete_bid(transfer_id) -> jsonify:
+    pass
