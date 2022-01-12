@@ -66,6 +66,12 @@ def get_transfer_bids(transfer_id):
 def create_bid(transfer_id) -> jsonify:
     '''submit a bid on a transfer'''
     request_body = request.get_json()
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
     error_state = False
     if request_body is None:
         abort(400)
@@ -74,7 +80,8 @@ def create_bid(transfer_id) -> jsonify:
         request_value = request_body.get('value', None)
         transfer = Transfer.query.filter(
             Transfer.id == transfer_id).one_or_more()
-        if transfer.date_completed is None:
+        if transfer.date_completed == None and \
+                transfer.from_team_id != team.id:
             bid = Bid(transfer_id=transfer.id,
                       team_id=request_team, bid_value=request_value)
             bid.setup()
@@ -93,6 +100,8 @@ def create_bid(transfer_id) -> jsonify:
                         'success': True,
                         'created': bid.id
                     })
+        else:
+            abort(401)
 
 
 @bids_bp.route('/bids/<int:bid_id>', methods=['PATCH'])
@@ -100,13 +109,153 @@ def create_bid(transfer_id) -> jsonify:
 def modify_bid(bid_id) -> jsonify:
     '''modify a bid on a transfer'''
     request_body = request.get_json()
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
     error_state = False
     if request_body is None:
         abort(400)
     else:
         request_value = request_body.get('value', None)
         bid = Bid.query.filter(Bid.id == bid_id).one_or_none()
+        if bid.transfer.date_completed == None and \
+                bid.transfer.from_team_id != team.id:
+            try:
+                bid.apply()
+            except sqlalchemy.exc.SQLAlchemyError as e:
+                bid.rollback()
+                error_state = True
+            finally:
+                bid.dispose()
+                if error_state:
+                    abort(500)
+                else:
+                    return jsonify({
+                        'success': True,
+                        'modified': bid_id
+                    })
+        else:
+            abort(401)
+
+
+@bids_bp.route('/transfer/<int:transfer_id>/bids', methods=['PATCH'])
+@jwt_required()
+def select_bid(transfer_id) -> jsonify:
+    '''select a bid'''
+    request_body = request.get_json()
+    error_state = False
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
+    if request_body is None:
+        abort(400)
+    else:
+        request_selected = request_body.get('selected', None)
+        if request_selected is None:
+            abort(400)
+        transfer = Transfer.query.filter(
+            Transfer.id == transfer_id).one_or_none()
+        selected_bid = Bid.query.filter(
+            Bid.id == request_selected).one_or_none()
+        other_bids = Bid.query.filter(
+            Bid.transfer_id == transfer_id and Bid.id != request_selected).all()
+
+        if transfer.id == selected_bid.transfer_id and \
+            transfer.team_id == team.id and \
+                transfer.date_completed == None:
+            try:
+                transfer.value_increase = randrange(110, 201)
+                transfer.stage()
+                selected_bid.selected_bid = True
+                selected_bid.stage()
+                for bid in other_bids:
+                    bid.selected_bid = False
+                    bid.stage()
+                transfer.apply()
+            except sqlalchemy.exc.SQLAlchemyError as e:
+                transfer.rollback()
+                error_state = True
+            finally:
+                transfer.dispose()
+                if error_state:
+                    abort(500)
+                else:
+                    return jsonify({
+                        'success': True,
+                        'modified': transfer.id
+                    })
+        else:
+            abort(401)
+
+
+@bids_bp.route('/transfers/<int:transfer_id>/bids', methods=['DELETE'])
+@jwt_required()
+def confirm_transfer(transfer_id) -> jsonify:
+    '''confirm transfer to complete'''
+    request_body = request.get_json()
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
+    if request_body is None:
+        abort(400)
+    else:
+        request_bid = request_body.get('bid_id', None)
+        request_confirmed = request_body.get('confirmed', None)
+        if request_confirmed is None or request_bid is None:
+            abort(400)
+        transfer = Transfer.query.filter(
+            Transfer.id == transfer_id).one_or_none()
+        from_team = Team.query.filter(
+            Team.id == transfer.from_team_id).one_or_none()
+        bid = Bid.query.filter(
+            Bid.id == request_bid).one_or_none()
+        if bid.selected_bid == True and \
+            transfer.id == bid.transfer_id and \
+            transfer.from_team_id != team.id and \
+                transfer.date_completed == None:
+            now = datetime.now()
+            transfer.date_completed = now.date()
+            player_value = bid.value + \
+                (bid.value*transfer.value_increase)
+            transfer.transfer_value = player_value
+            transfer.player.value = player_value
+            transfer.stage()
+            team.value += player_value
+            team.stage()
+            from_team.value -= player_value
+            from_team.stage()
+            
+
+        else:
+            pass
+
+
+@bids_bp.route('/bids/<int:bid_id>', methods=['DELETE'])
+@jwt_required()
+def delete_bid(bid_id) -> jsonify:
+    '''delete a bid on a transfer'''
+    identity = get_jwt_identity()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    team = Team.query.filter(Team.account_id == account.id).one_or_none()
+    error_state = False
+
+    bid = Bid.query.filter(Bid.id == bid_id).one_or_none()
+    if bid.transfer.date_completed == None and \
+            bid.transfer.from_team_id != team.id:
         try:
+            bid.delete()
             bid.apply()
         except sqlalchemy.exc.SQLAlchemyError as e:
             bid.rollback()
@@ -120,52 +269,5 @@ def modify_bid(bid_id) -> jsonify:
                     'success': True,
                     'modified': bid_id
                 })
-
-
-@bids_bp.route('/transfer/<int:transfer_id>/bids', methods=['PATCH'])
-@jwt_required()
-def select_bid(transfer_id) -> jsonify:
-    '''select a bid'''
-    request_body = request.get_json()
-    error_state = False
-    if request_body is None:
-        abort(400)
     else:
-        request_selected = request_body.get('selected', None)
-        if request_selected is None:
-            abort(400)
-        transfer = Transfer.query.filter(
-            Transfer.id == transfer_id).one_or_none()
-        selected_bid = Bid.query.filter(
-            Bid.id == request_selected).one_or_none()
-        other_bids = Bid.query.filter(
-            Bid.transfer_id == transfer_id and Bid.id != request_selected).all()
-        now = datetime.now()
-        try:
-            transfer.value_increase = (
-                100 + randrange(10, 101)) * max(transfer.value, transfer.player.value)
-            transfer.date_completed = now.date()
-            transfer.stage()
-            selected_bid.selected_bid = True
-            selected_bid.stage()
-            for bid in other_bids:
-                bid.selected = False
-                bid.stage()
-            transfer.apply()
-        except sqlalchemy.exc.SQLAlchemyError as e:
-            transfer.rollback()
-            error_state = True
-        finally:
-            transfer.dispose()
-            if error_state:
-                abort(500)
-            else:
-                return jsonify({
-                    'success': True,
-                    'modified': transfer.id
-                })
-
-@bids_bp.route('/bids/<int:bid_id>', methods=['DELETE'])
-@jwt_required()
-def delete_bid(transfer_id) -> jsonify:
-    pass
+        abort(401)
