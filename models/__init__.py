@@ -138,6 +138,7 @@ class Team(db.Model, OnlineManagerModel):
                 'budget': self.budget,
                 'country_id': self.country_id,
                 'country': self.country.name,
+                'name': self.name,
                 'value': self.value()}
 
 

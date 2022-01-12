@@ -613,3 +613,349 @@ curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/jso
   "success": true
 }
 ```
+
+### Teams
+
+#### GET `/teams`
+
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams
+```
+
+```json
+{
+  "success": true,
+  "teams": [
+    {
+      "account": "slayer102",
+      "account_id": 17,
+      "budget": "5000000",
+      "country": "Switzerland",
+      "country_id": 14,
+      "id": 8,
+      "name": "Fkmcduvaeh Vikings",
+      "value": "20000000"
+    },
+    {
+      "account": "the_urge22",
+      "account_id": 18,
+      "budget": "5000000",
+      "country": "Algeria",
+      "country_id": 22,
+      "id": 9,
+      "name": "Algiers Shockers 9442",
+      "value": "20000000"
+    }
+  ]
+}
+```
+
+#### GET `/teams/{team_id}`
+
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams/8
+```
+
+```json
+{
+  "success": true,
+  "team": {
+    "account": "slayer102",
+    "account_id": 17,
+    "budget": "5000000",
+    "country": "Switzerland",
+    "country_id": 14,
+    "id": 8,
+    "name": "Fkmcduvaeh Vikings",
+    "value": "20000000"
+  }
+}
+```
+
+#### GET `/teams/{team_id}/players`
+
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/teams/9/players
+```
+
+```json
+{
+  "players": [
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Thu, 11 Jan 2001 00:00:00 GMT",
+      "firstname": "Jean-Paul",
+      "id": 121,
+      "lastname": "Kachingwe",
+      "position_id": 1,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Thu, 11 Jan 2001 00:00:00 GMT",
+      "firstname": "Kojo",
+      "id": 122,
+      "lastname": "Watanabe",
+      "position_id": 1,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sat, 11 Jan 2003 00:00:00 GMT",
+      "firstname": "George",
+      "id": 123,
+      "lastname": "Fernandez",
+      "position_id": 1,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sat, 11 Jan 1997 00:00:00 GMT",
+      "firstname": "Yamikani",
+      "id": 124,
+      "lastname": "Nunez",
+      "position_id": 4,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Wed, 11 Jan 2006 00:00:00 GMT",
+      "firstname": "Alexander",
+      "id": 125,
+      "lastname": "Leroy",
+      "position_id": 4,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sat, 11 Jan 2003 00:00:00 GMT",
+      "firstname": "William",
+      "id": 126,
+      "lastname": "SakalaKapalamula",
+      "position_id": 4,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Mon, 11 Jan 1999 00:00:00 GMT",
+      "firstname": "Thomas",
+      "id": 127,
+      "lastname": "Tanaka",
+      "position_id": 4,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sat, 11 Jan 1997 00:00:00 GMT",
+      "firstname": "Abdalla",
+      "id": 128,
+      "lastname": "Mendez",
+      "position_id": 4,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Tue, 11 Jan 1994 00:00:00 GMT",
+      "firstname": "Akwesi",
+      "id": 129,
+      "lastname": "Suleiman",
+      "position_id": 4,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Fri, 11 Jan 2002 00:00:00 GMT",
+      "firstname": "Adetokunbo",
+      "id": 130,
+      "lastname": "Svoboda",
+      "position_id": 5,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Thu, 11 Jan 2001 00:00:00 GMT",
+      "firstname": "Mphatso",
+      "id": 131,
+      "lastname": "Fischer",
+      "position_id": 5,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Thu, 11 Jan 1996 00:00:00 GMT",
+      "firstname": "Charles",
+      "id": 132,
+      "lastname": "Mofokeng",
+      "position_id": 5,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Tue, 11 Jan 1994 00:00:00 GMT",
+      "firstname": "Yamikani",
+      "id": 133,
+      "lastname": "Herrera",
+      "position_id": 5,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sat, 11 Jan 2003 00:00:00 GMT",
+      "firstname": "George",
+      "id": 134,
+      "lastname": "Mendez",
+      "position_id": 5,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Wed, 11 Jan 2006 00:00:00 GMT",
+      "firstname": "Kwabena",
+      "id": 135,
+      "lastname": "Kumwenda",
+      "position_id": 5,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sat, 11 Jan 1997 00:00:00 GMT",
+      "firstname": "Jacques",
+      "id": 136,
+      "lastname": "Suleiman",
+      "position_id": 6,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Wed, 11 Jan 2006 00:00:00 GMT",
+      "firstname": "Kgomotso",
+      "id": 137,
+      "lastname": "Sene",
+      "position_id": 6,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Wed, 11 Jan 1995 00:00:00 GMT",
+      "firstname": "Mphatso",
+      "id": 138,
+      "lastname": "Martin",
+      "position_id": 6,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sun, 11 Jan 1998 00:00:00 GMT",
+      "firstname": "Yamikani",
+      "id": 139,
+      "lastname": "Mwenda",
+      "position_id": 6,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Algeria",
+      "country_id": 22,
+      "date_of_birth": "Sun, 11 Jan 2004 00:00:00 GMT",
+      "firstname": "Frederic",
+      "id": 140,
+      "lastname": "Oliveira",
+      "position_id": 6,
+      "team": "Algiers Shockers 9442",
+      "team_id": 9,
+      "transfer_listed": false,
+      "value": "1000000"
+    }
+  ],
+  "success": true
+}
+```
+
+#### PATCH `/team/{team_id}`
+
+```bash
+curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN2" -d '{"name":"Lucerne Vikings"}' http://127.0.0.1
+:5000/teams/8
+```
+
+```json
+{
+  "modified": 8,
+  "success": true
+}
+```
