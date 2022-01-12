@@ -178,6 +178,19 @@ def select_bid(transfer_id) -> jsonify:
                     bid.selected_bid = False
                     bid.stage()
                 transfer.apply()
+                now = datetime.now()
+                msg = EmailMessage()
+                msg.set_content(
+                    f'''Your bid for the player {} has been accepted at {now.strftime("%Y-%m-%d %H:%M:%S")}.
+                    Please confirm the transfer to complete the transaction.
+                    '''
+                )
+                msg['Subject'] = f'Please confirm your email address.'
+                msg['From'] = 'no-reply@soccermanager.local'
+                msg['To'] = identity
+                s = smtplib.SMTP(host='localhost', port=8025)
+                s.send_message(msg)
+                s.quit()
             except sqlalchemy.exc.SQLAlchemyError as e:
                 transfer.rollback()
                 error_state = True
@@ -204,7 +217,7 @@ def confirm_transfer(transfer_id) -> jsonify:
         Credential.email == identity).one_or_none()
     account = Account.query.filter(
         Account.credential_id == credential.id).one_or_none()
-    team = Team.query.filter(Team.account_id == account.id).one_or_none()
+    to_team = Team.query.filter(Team.account_id == account.id).one_or_none()
     if request_body is None:
         abort(400)
     else:
@@ -222,21 +235,54 @@ def confirm_transfer(transfer_id) -> jsonify:
             transfer.id == bid.transfer_id and \
             transfer.from_team_id != team.id and \
                 transfer.date_completed == None:
-            now = datetime.now()
-            transfer.date_completed = now.date()
-            player_value = bid.value + \
-                (bid.value*transfer.value_increase)
-            transfer.transfer_value = player_value
-            transfer.player.value = player_value
-            transfer.stage()
-            team.value += player_value
-            team.stage()
-            from_team.value -= player_value
-            from_team.stage()
-            
+            try:
+                if request_confirmed==True:
+                    now = datetime.now()
+                    transfer.date_completed = now.date()
+                    player_value = bid.value + \
+                        (bid.value*transfer.value_increase)
+                    transfer.transfer_value = player_value
+                    transfer.to_team_id=to_team.id
+                    transfer.player.value = player_value
+                    transfer.stage()
 
+                    team.value += player_value
+                    team.stage()
+
+                    from_team.value -= player_value
+                    from_team.stage()
+
+                    transfer.apply()
+                    now = datetime.now()
+                    msg = EmailMessage()
+                    msg.set_content(
+                        f'''The trnasfer of the player {} has been confirmed at {now.strftime("%Y-%m-%d %H:%M:%S")}.
+                        '''
+                    )
+                    msg['Subject'] = f'Please confirm your email address.'
+                    msg['From'] = 'no-reply@soccermanager.local'
+                    msg['To'] = identity
+                    s = smtplib.SMTP(host='localhost', port=8025)
+                    s.send_message(msg)
+                    s.quit()
+                else:
+                    transfer.date_completed = None
+                    bid.selected_bid = False
+                    transfer.apply()
+            except sqlalchemy.exc.SQLAlchemyError as e:
+                transfer.rollback()
+                error_state = True
+            finally:
+                transfer.dispose()
+                if error_state:
+                    abort(500)
+                else:
+                    return jsonify({
+                        'success': True,
+                        'modified': bid_id
+                    })
         else:
-            pass
+            abort(401)
 
 
 @bids_bp.route('/bids/<int:bid_id>', methods=['DELETE'])
