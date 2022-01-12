@@ -259,14 +259,17 @@ class Transfer(db.Model, OnlineManagerModel):
                 'date_completed': self.date_completed}
 
     def bid_selected(self):
-        self.value_increase = randrange(110, 201)
+        self.value_increase = randrange(110, 201)/100
 
     def transfer_confirmed(self, player_value, team_id):
         now = datetime.now()
         self.date_completed = now.date()
         self.transfer_value = player_value
         self.to_team_id = team_id
-        self.player.value = player_value
+        self.player.value = player_value * self.value_increase
+        self.player.team_id = team_id
+        self.from_team.budget += player_value
+        self.to_team.budget -= player_value
 
 
 class Bid(db.Model, OnlineManagerModel):

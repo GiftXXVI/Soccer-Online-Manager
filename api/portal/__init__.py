@@ -10,8 +10,6 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 from email.utils import parseaddr
-import smtplib
-from email.message import EmailMessage
 from datetime import datetime, timedelta
 
 from utilities import sendmail
@@ -222,7 +220,7 @@ def reset_password() -> jsonify:
                     if error_state:
                         abort(500)
                     else:
-                        message = f'Your password has been reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                        message = f'Your password has been reset at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
                             f'If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.'
                         sendmail(credential.email, message)
                         return jsonify({
@@ -241,18 +239,11 @@ def reset_password() -> jsonify:
                     credential.rollback()
                     error_state = True
                 finally:
-                    now = datetime.now()
-                    msg = EmailMessage()
-                    msg.set_content(
-                        f'''You have requested a password reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.
-                        Please use the code {confirmation_code[:5]} to set a new password.
-                        Otherwise, ignore this email.''')
-                    msg['Subject'] = f'You have requested a password reset.'
-                    msg['From'] = 'no-reply@soccermanager.local'
-                    msg['To'] = parsed_email
-                    s = smtplib.SMTP(host='localhost', port=8025)
-                    s.send_message(msg)
-                    s.quit()
+                    message = f'You have requested a password reset at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                        f'Please use the code {confirmation_code[:5]} to set a new password.' + \
+                        'Otherwise, ignore this email.'
+
+                    sendmail(credential.email, message)
                     return jsonify({
                         'success': True,
                         'reset': credential.id

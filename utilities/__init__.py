@@ -4,7 +4,6 @@ from datetime import datetime
 
 
 def sendmail(recepient, message):
-    now = datetime.now()
     msg = EmailMessage()
     msg.set_content(message)
     msg['Subject'] = f'Please confirm your email address.'
