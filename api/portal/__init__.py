@@ -67,10 +67,13 @@ def create_credential() -> jsonify:
                 if error_state:
                     abort(500)
                 else:
-                    message = f'Your account has been created at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                    now = datetime.now()
+                    f_now = now.strftime("%Y-%m-%d %H:%M:%S")
+                    f_code = confirmation_code[:5]
+                    message = f'Your account has been created at {f_now}.' + \
                         f'The request id is {credential.id}.' + \
                         f'You are required confirm your email address.' + \
-                        f'The confirmation code is {confirmation_code[:5]}.'
+                        f'The confirmation code is {f_code}.'
                     sendmail(credential.email, message)
 
                     return jsonify({
@@ -220,8 +223,11 @@ def reset_password() -> jsonify:
                     if error_state:
                         abort(500)
                     else:
-                        message = f'Your password has been reset at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
-                            f'If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.'
+                        now = datetime.now()
+                        f_now = now.strftime("%Y-%m-%d %H:%M:%S")
+                        f_code = confirmation_code[:5]
+                        message = f'Your password has been reset at {f_now}.' + \
+                            f'If you did not initiate this action, use the code {f_code} to set a new password.'
                         sendmail(credential.email, message)
                         return jsonify({
                             'success': True,
@@ -239,8 +245,11 @@ def reset_password() -> jsonify:
                     credential.rollback()
                     error_state = True
                 finally:
-                    message = f'You have requested a password reset at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
-                        f'Please use the code {confirmation_code[:5]} to set a new password.' + \
+                    now = datetime.now()
+                    f_now = now.strftime("%Y-%m-%d %H:%M:%S")
+                    f_code = confirmation_code[:5]
+                    message = f'You have requested a password reset at {f_now}.' + \
+                        f'Please use the code {f_code} to set a new password.' + \
                         'Otherwise, ignore this email.'
 
                     sendmail(credential.email, message)
@@ -289,7 +298,9 @@ def confirm_reset_password() -> jsonify:
                 if error_state:
                     abort(500)
                 else:
-                    message = f'Your password has been reset at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                    now = datetime.now()
+                    f_now = now.strftime("%Y-%m-%d %H:%M:%S")
+                    message = f'Your password has been reset at {f_now}.' + \
                         f'If you did not initiate this action, please reset your password.'
                     sendmail(credential.email, message)
                     return jsonify({
