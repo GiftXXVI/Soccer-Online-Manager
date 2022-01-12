@@ -14,6 +14,8 @@ import smtplib
 from email.message import EmailMessage
 from datetime import datetime, timedelta
 
+from utilities import sendmail
+
 ph = PasswordHasher()
 
 portal_bp = Blueprint('portal_bp', __name__)
@@ -67,21 +69,12 @@ def create_credential() -> jsonify:
                 if error_state:
                     abort(500)
                 else:
-                    now = datetime.now()
-                    msg = EmailMessage()
-                    msg.set_content(
-                        f'''Your account has been created at {now.strftime("%Y-%m-%d %H:%M:%S")}.
-                        The request id is {credential.id}.
-                        You are required confirm your email address.
-                        The confirmation code is {confirmation_code[:5]}.
-                        '''
-                    )
-                    msg['Subject'] = f'Please confirm your email address.'
-                    msg['From'] = 'no-reply@soccermanager.local'
-                    msg['To'] = parsed_email
-                    s = smtplib.SMTP(host='localhost', port=8025)
-                    s.send_message(msg)
-                    s.quit()
+                    message = f'Your account has been created at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                        f'The request id is {credential.id}.' + \
+                        f'You are required confirm your email address.' + \
+                        f'The confirmation code is {confirmation_code[:5]}.'
+                    sendmail(credential.email, message)
+
                     return jsonify({
                         'success': True,
                         'created': credential.id
@@ -170,7 +163,8 @@ def issue_token() -> jsonify:
 def refresh_token() -> jsonify:
     request_body = request.get_json()
     identity = get_jwt_identity()
-    credential = Credential.query.filter(Credential.email==identity).one_or_none()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
     if request_body is None:
         abort(400)
     else:
@@ -228,17 +222,9 @@ def reset_password() -> jsonify:
                     if error_state:
                         abort(500)
                     else:
-                        now = datetime.now()
-                        msg = EmailMessage()
-                        msg.set_content(
-                            f'''Your password has been reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.
-                            If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.''')
-                        msg['Subject'] = f'Your password has been reset.'
-                        msg['From'] = 'no-reply@soccermanager.local'
-                        msg['To'] = parsed_email
-                        s = smtplib.SMTP(host='localhost', port=8025)
-                        s.send_message(msg)
-                        s.quit()
+                        message = f'Your password has been reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                            f'If you did not initiate this action, use the code {confirmation_code[:5]} to set a new password.'
+                        sendmail(credential.email, message)
                         return jsonify({
                             'success': True,
                             'reset': credential.id
@@ -312,17 +298,9 @@ def confirm_reset_password() -> jsonify:
                 if error_state:
                     abort(500)
                 else:
-                    now = datetime.now()
-                    msg = EmailMessage()
-                    msg.set_content(
-                        f'''Your password has been reset at {now.strftime("%Y-%m-%d %H:%M:%S")}.
-                        If you did not initiate this action, please reset your password.''')
-                    msg['Subject'] = f'Your password has been reset.'
-                    msg['From'] = 'no-reply@soccermanager.local'
-                    msg['To'] = parsed_email
-                    s = smtplib.SMTP(host='localhost', port=8025)
-                    s.send_message(msg)
-                    s.quit()
+                    message = f'Your password has been reset at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.' + \
+                        f'If you did not initiate this action, please reset your password.'
+                    sendmail(credential.email, message)
                     return jsonify({
                         'success': True,
                         'reset': id

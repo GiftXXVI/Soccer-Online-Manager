@@ -1,3 +1,4 @@
+from email import message
 from flask import Blueprint
 from models import Credential, Account, Transfer
 from models import Bid, Team
@@ -7,6 +8,9 @@ from flask_jwt_extended import jwt_required
 from datetime import datetime
 import sqlalchemy
 from random import randrange
+
+from utilities import sendmail
+
 
 bids_bp = Blueprint('bids_bp', __name__)
 
@@ -170,27 +174,24 @@ def select_bid(transfer_id) -> jsonify:
             transfer.team_id == team.id and \
                 transfer.date_completed == None:
             try:
-                transfer.value_increase = randrange(110, 201)
+                # update transfer
+                transfer.bid_selected()
                 transfer.stage()
+
+                # update selected bid
                 selected_bid.selected_bid = True
                 selected_bid.stage()
+
+                # update other bids
                 for bid in other_bids:
                     bid.selected_bid = False
                     bid.stage()
+
                 transfer.apply()
-                now = datetime.now()
-                msg = EmailMessage()
-                msg.set_content(
-                    f'''Your bid for the player {} has been accepted at {now.strftime("%Y-%m-%d %H:%M:%S")}.
-                    Please confirm the transfer to complete the transaction.
-                    '''
-                )
-                msg['Subject'] = f'Please confirm your email address.'
-                msg['From'] = 'no-reply@soccermanager.local'
-                msg['To'] = identity
-                s = smtplib.SMTP(host='localhost', port=8025)
-                s.send_message(msg)
-                s.quit()
+                message = f'Your bid for the player {transfer.player.name()}' + \
+                    f'has been selected at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}. \n' + \
+                    'Please confirm the transfer to complete the transaction.'
+                sendmail(identity, message)
             except sqlalchemy.exc.SQLAlchemyError as e:
                 transfer.rollback()
                 error_state = True
@@ -233,38 +234,29 @@ def confirm_transfer(transfer_id) -> jsonify:
             Bid.id == request_bid).one_or_none()
         if bid.selected_bid == True and \
             transfer.id == bid.transfer_id and \
-            transfer.from_team_id != team.id and \
+            transfer.from_team_id != to_team.id and \
                 transfer.date_completed == None:
             try:
-                if request_confirmed==True:
-                    now = datetime.now()
-                    transfer.date_completed = now.date()
+                if request_confirmed == True:
                     player_value = bid.value + \
                         (bid.value*transfer.value_increase)
-                    transfer.transfer_value = player_value
-                    transfer.to_team_id=to_team.id
-                    transfer.player.value = player_value
+
+                    transfer.transfer_confirmed(player_value, to_team.id)
                     transfer.stage()
 
-                    team.value += player_value
-                    team.stage()
+                    to_team.value += player_value
+                    to_team.stage()
 
                     from_team.value -= player_value
                     from_team.stage()
 
                     transfer.apply()
-                    now = datetime.now()
-                    msg = EmailMessage()
-                    msg.set_content(
-                        f'''The trnasfer of the player {} has been confirmed at {now.strftime("%Y-%m-%d %H:%M:%S")}.
-                        '''
-                    )
-                    msg['Subject'] = f'Please confirm your email address.'
-                    msg['From'] = 'no-reply@soccermanager.local'
-                    msg['To'] = identity
-                    s = smtplib.SMTP(host='localhost', port=8025)
-                    s.send_message(msg)
-                    s.quit()
+
+                    message = f'The transfer of the player {transfer.player.name()}' + \
+                        f'has been confirmed at {datetime.now.strftime("%Y-%m-%d %H:%M:%S")}.'
+
+                    sendmail(identity, message)
+
                 else:
                     transfer.date_completed = None
                     bid.selected_bid = False
@@ -279,7 +271,7 @@ def confirm_transfer(transfer_id) -> jsonify:
                 else:
                     return jsonify({
                         'success': True,
-                        'modified': bid_id
+                        'modified': bid.id
                     })
         else:
             abort(401)
