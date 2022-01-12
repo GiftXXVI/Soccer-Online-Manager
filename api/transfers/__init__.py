@@ -68,7 +68,9 @@ def create_transfer() -> jsonify:
             player_active_transfers = Transfer.query.filter(
                 Transfer.player_id == request_player, Transfer.date_completed is not None).all()
             if player is not None and team is not None:
-                if len(player_active_transfers) == 0 and player.team_id == team.id and team.account.credential_id == credential.id:
+                if len(player_active_transfers) == 0 and \
+                        player.team_id == team.id and \
+                        team.account.credential_id == credential.id:
                     transfer = Transfer(
                         player_id=request_player,
                         from_team_id=request_from_team,
@@ -121,11 +123,11 @@ def modify_transfer(transfer_id):
                     Player.id == transfer.player_id).one_or_none()
                 team = Team.query.filter(
                     Team.id == transfer.from_team_id).one_or_none()
-                if transfer.date_completed is not None and \
+                if transfer.date_completed == None and \
                         player.team_id == team.id and \
                         team.account.credential_id == credential.id:
                     try:
-                        transfer.value = request_value
+                        transfer.transfer_value = request_value
                         transfer.apply()
                     except sqlalchemy.exc.SQLAlchemyError as e:
                         transfer.rollback()
@@ -159,7 +161,7 @@ def delete_transfer(transfer_id) -> jsonify:
             Player.id == transfer.player_id).one_or_none()
         team = Team.query.filter(
             Team.id == transfer.from_team_id).one_or_none()
-        if transfer.date_completed is not None and \
+        if transfer.date_completed == None and \
                 player.team_id == team.id and \
                 team.account.credential_id == credential.id:
             try:

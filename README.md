@@ -959,11 +959,15 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
   "success": true
 }
 ```
+
 ### Players
+
 #### GET `/players`
+
 ```bash
  curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/players
 ```
+
 ```json
 {
   "players": [
@@ -1088,10 +1092,13 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
   "success": true
 }
 ```
+
 #### GET `/players/{player_id}`
+
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
 ```
+
 ```json
 {
   "player": {
@@ -1110,22 +1117,29 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
   "success": true
 }
 ```
+
 #### PATCH `/players/{player_id}`
+
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Rudolfo","lastname":"Oliveira"
 }' http://127.0.0.1:5000/players/140
 ```
+
 ```json
 {
   "modified": 140,
   "success": true
 }
 ```
+
 ### Transfers
+
 #### GET `/transfers`
+
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
 ```
+
 ```json
 {
   "accounts": [
@@ -1144,10 +1158,13 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
   "success": true
 }
 ```
+
 #### GET `/transfers/state/{state_id}`
+
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/state/0
 ```
+
 ```json
 {
   "accounts": [
@@ -1166,13 +1183,42 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/st
   "success": true
 }
 ```
-#### POST `/transfers/`
+
+#### POST `/transfers`
+
 ```bash
 curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"player_id":"140","from_team_id":"9","transfer_value":1500000}' http://127.0.0.1:5000/transfers
 ```
+
 ```json
 {
   "created": 3,
+  "success": true
+}
+```
+
+#### PATCH `/transfers`
+
+```bash
+curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1750000"}' http://127.0.0.1:5000/transfers/3
+```
+
+```json
+{
+  "modified": 3,
+  "success": true
+}
+```
+
+#### DELETE `/transfers`
+
+```bash
+curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/transfers/3
+```
+
+```json
+{
+  "deleted": 3,
   "success": true
 }
 ```
