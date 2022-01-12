@@ -959,3 +959,165 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
   "success": true
 }
 ```
+### Players
+#### GET `/players`
+```bash
+ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/players
+```
+```json
+{
+  "players": [
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Sat, 11 Jan 2003 00:00:00 GMT",
+      "firstname": "Kumbukani",
+      "id": 101,
+      "lastname": "Goncalves",
+      "position_id": 1,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Sun, 11 Jan 2004 00:00:00 GMT",
+      "firstname": "George",
+      "id": 102,
+      "lastname": "Petit",
+      "position_id": 1,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Sun, 11 Jan 1998 00:00:00 GMT",
+      "firstname": "Pierre",
+      "id": 103,
+      "lastname": "Simon",
+      "position_id": 1,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Tue, 11 Jan 1994 00:00:00 GMT",
+      "firstname": "Adetokunbo",
+      "id": 104,
+      "lastname": "Ingabire",
+      "position_id": 4,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Wed, 11 Jan 2006 00:00:00 GMT",
+      "firstname": "Fatsani",
+      "id": 105,
+      "lastname": "Keita",
+      "position_id": 4,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Thu, 11 Jan 1996 00:00:00 GMT",
+      "firstname": "Abdalla",
+      "id": 106,
+      "lastname": "Kachingwe",
+      "position_id": 4,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Sun, 11 Jan 2004 00:00:00 GMT",
+      "firstname": "Limbikani",
+      "id": 107,
+      "lastname": "Barbosa",
+      "position_id": 4,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Tue, 11 Jan 2005 00:00:00 GMT",
+      "firstname": "Jean-Luc",
+      "id": 108,
+      "lastname": "Leroy",
+      "position_id": 4,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    },
+    {
+      "country": "Switzerland",
+      "country_id": 14,
+      "date_of_birth": "Wed, 11 Jan 1995 00:00:00 GMT",
+      "firstname": "Adetokunbo",
+      "id": 109,
+      "lastname": "Dupont",
+      "position_id": 4,
+      "team": "Lucerne Vikings",
+      "team_id": 8,
+      "transfer_listed": false,
+      "value": "1000000"
+    }
+  ],
+  "success": true
+}
+```
+#### GET `/players/{player_id}`
+```bash
+curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
+```
+```json
+{
+  "player": {
+    "country": "Algeria",
+    "country_id": 22,
+    "date_of_birth": "Sun, 11 Jan 2004 00:00:00 GMT",
+    "firstname": "Frederic",
+    "id": 140,
+    "lastname": "Oliveira",
+    "position_id": 6,
+    "team": "Algiers Shockers 9442",
+    "team_id": 9,
+    "transfer_listed": false,
+    "value": "1000000"
+  },
+  "success": true
+}
+```
+#### PATCH `/players/{player_id}`
+```bash
+curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Rudolfo","lastname":"Oliveira"
+}' http://127.0.0.1:5000/players/140
+```
+```json
+{
+  "modified": 140,
+  "success": true
+}
+```
