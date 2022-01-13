@@ -1,12 +1,20 @@
-## Getting Started
+# Soccer Manager API
 
-### Getting Started
+## Introduction
+
+The Soccer Manager API is a web API for trading virtual football players. It is a Flask based API backend designed to be used with a Javascript based frontend client.
+
+The motivation behind its development is to create a simple, secure API for creating players, teams and trading players between teams.
+
+The API code has been written according to [pep8 guidelines](http://www.python.org/dev/peps/pep-0008/).
+
+## Getting Started
 
 Base URL: the API can be accessed at the following URL `http://127.0.0.1:5000`
 
 Authentication: The API requires a valid Token to accompany every request before access can be granted depending on the claims present in the Token and the identity of the user.
 
-### Dependencies
+## Dependencies
 
 Install all dependencies by running the following command from the root directory (preferably inside a virtual environment):
 
@@ -14,7 +22,7 @@ Install all dependencies by running the following command from the root director
 pip install -r requirements.txt
 ```
 
-### Tech Stack/Tools
+## Tech Stack/Tools
 The project has been developed using the following tech stack:
 
 Python 3.8.10
@@ -23,18 +31,27 @@ The versions of all libraries can be found in the file requirements.txt
 
 The code was written in Visual Studio Code 1.62.0 on Windows 10 WSL inside Ubuntu 20.04.3 LTS.
 
-### Databases
+## Databases
 
-Created the live database using the following command:
+The API depends on the presence of a postgresql database, whose name should be properly configured in the `LIVEDB_NAME` environment variable.
+
+The live database can be created using the following command:
 
 ```bash
 sudo -u postgres createdb soccer_online_manager
 ```
 
-and the test database using the following command:
+Unit Tests should depend on the presence of a postgresql database, whose name should be properly configured in the `TESTDB_NAME` environment variable.
+
+The test database can be created using the following command:
 
 ```bash
 sudo -u postgres createdb soccer_online_manager_test
+```
+After both databases (live and test) have been created, update their schema by running migrations against each database (make sure that the FLASK_APP environment variable is defined before running the command).
+
+```bash
+flask db upgrade
 ```
 
 If the database service is not running, it may be necessary to start it using the following command:
@@ -43,20 +60,83 @@ If the database service is not running, it may be necessary to start it using th
 sudo service postgresql start
 ```
 
-It may be neccesarry to run migrations using the following command:
-In case changes are made to the data model in `model/__init__.py`, it may be necessary to run the 2 comands below to apply the changes to the database tables.
+### Installation
+
+To start the web API; make sure that the database service is running, if it is not yet running; start it using the following command:
 
 ```bash
-flask db migrate -m "Changed User Refs to Account"
+sudo service postgresql start
 ```
+then navigate to the root directory and run the following commands:
 
 ```bash
-flask db upgrade
+export LIVEDB_NAME={database_name}
+export LIVEDB_USER={username}
+export LIVEDB_PASS={password}
+export LIVEDB_HOST={hostname}
+export LIVEDB_PORT={port_number}
+export TESTDB_NAME={test_database_name}
+export TESTDB_USER={test_username}
+export TESTDB_PASS={test_password}
+export TESTDB_HOST={test_hostname}
+export TESTDB_PORT={test_port_number}
+export FLASK_APP=api
+export FLASK_ENV=development
+```
+To start the application, run the following command:
+
+```bash
+flask run
 ```
 
-## Resource Endpoint Library
+However, it may also be run using gunicorn (a production ready web server) as follows:
 
-### Email Output
+```bash
+gunicorn --bind 0.0.0.0:5000 api:app
+```
+
+## Unit Tests
+
+Unit tests depend on the test environment variables as defined in the [Getting Started](#Getting-Started) section above.
+Unit tests can be defined in the `tests` directory and they should be run by running the file `test.py` as follows:
+
+```bash
+python3 test.py
+```
+## API Reference
+
+### Errors
+
+Errors are returned in the following format:
+
+```json
+{
+  "success": false,
+  "error": 400,
+  "message": "bad request"
+}
+```
+
+Every error response contains a the HTTP status code under the index `error`, a boolean result `false` under the index `success` and a brief message describing the error under the index `message`.
+
+In the event of an error, the API may return one of the following HTTP status codes:
+
+- `404`: not found
+- `401`: unauthorized
+- `403`: forbidden
+- `405`: not allowed
+- `422`: unprocessable
+- `400`: bad request
+- `500`: server error
+
+## User Claims
+
+Users can be created with the role_id claim. This is stored as a credential attribute in the database. Setting this value to 1 gives the credential elevated permissions in certain areas of the system (for example; the ability to view all Teams or all Players).
+
+
+### Resource Endpoint Library
+
+#### Email Output
 
 All email output in this documentation is extracted via a Python SMTP Debugging Server.
 
@@ -64,11 +144,11 @@ All email output in this documentation is extracted via a Python SMTP Debugging 
 python3 -m smtpd -n -c DebuggingServer localhost:8025
 ```
 
-### Portal
+#### Portal
 
-#### POST `/portal/register`
+##### POST `/portal/register`
 
-##### Sample Request and Response
+###### Sample Request and Response
 
 ```bash
 curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/register
