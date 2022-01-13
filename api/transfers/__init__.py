@@ -20,7 +20,7 @@ def get_transfers() -> jsonify:
         transfers_f = [transfer.format() for transfer in transfers]
         return jsonify({
             'success': True,
-            'accounts': transfers_f
+            'transfers': transfers_f
         })
     else:
         abort(401)
@@ -39,7 +39,7 @@ def get_transfers_state(completed) -> jsonify:
     transfers_f = [transfer.format() for transfer in transfers]
     return jsonify({
         'success': True,
-        'accounts': transfers_f
+        'transfers': transfers_f
     })
 
 

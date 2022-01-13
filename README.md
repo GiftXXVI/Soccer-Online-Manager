@@ -148,16 +148,33 @@ python3 -m smtpd -n -c DebuggingServer localhost:8025
 
 ##### POST `/portal/register`
 
+###### Description
+
+This endpoint is used to create a user credential.
+
+###### Request Body
+
+The request body should have the details of the user such as their: 
+- firstname
+- lastname
+- date of birth
+- email
+- password
+
+###### Response Body
+
+The normal response contains the id of the created user and a success value of True.
+
 ###### Sample Request and Response
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/register
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/register
 ```
 
 Or with an optional role parameter:
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"gift.chimphonda@gmail.local","password":";;87^child^BORROW^each^04;;","role":1}' http://127.0.0.1:5000/portal/register
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"gift.chimphonda@gmail.local","password":";;87^child^BORROW^each^04;;","role":1}' http://127.0.0.1:5000/portal/register
 ```
 
 ```json
@@ -166,6 +183,8 @@ curl -X POST -H "Content-Type:application/json" -d '{"firstname":"Kwabena","last
   "success": true
 }
 ```
+
+It will also generate an email message to the user requesting them to verify their account as shown below.
 
 ```bash
 ---------- MESSAGE FOLLOWS ----------
@@ -187,10 +206,22 @@ b'                        '
 
 #### POST `/portal/confirm/{credential_id}`
 
+###### Description
+
+This endpoint is used to confirm a user credential email address.
+
+###### Request Body
+
+The request body should have the confirmation code and the email address of the user.
+
+###### Response Body
+
+The normal response contains the id of the activated user and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -d '{"code":"45777","email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/confirm/50
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"code":"45777","email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/confirm/50
 ```
 
 ```json
@@ -202,10 +233,24 @@ curl -X POST -H "Content-Type:application/json" -d '{"code":"45777","email":"k.s
 
 #### POST `/portal/login`
 
+###### Description
+
+This endpoint is used to login using a user credential.
+
+###### Request Body
+
+The request body should have the details of the user such as their: 
+- email
+- password
+
+###### Response Body
+
+The normal response contains the token issued and a success value of True.
+
 #### Sample Request and Response
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -d '{"email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/login
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"email":"k.santos@yahoo.local","password":";;87^child^BORROW^each^04;;"}' http://127.0.0.1:5000/portal/login
 ```
 
 ```json
@@ -216,6 +261,18 @@ curl -X POST -H "Content-Type:application/json" -d '{"email":"k.santos@yahoo.loc
 ```
 
 #### POST `/portal/refresh`
+
+###### Description
+
+This endpoint is used to refresh a user token before expiry.
+
+###### Request Body
+
+The request body should have the users email address and the current token.
+
+###### Response Body
+
+The normal response contains the new token and a success value of True.
 
 ##### Sample Refresh and Response
 
@@ -236,6 +293,18 @@ curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN"
 
 #### PATCH `/portal/reset`
 
+###### Description
+
+This endpoint is used to reset a user password.
+
+###### Request Body
+
+The request body should either have the email address, old password and new password (if the user remembers their old password) or only the email address (if they do not remember).
+
+###### Response Body
+
+The normal response contains the id of the user and a success value of True.
+
 ##### Sample Request and Response
 
 ###### Option 1: Provide Only Email
@@ -245,6 +314,8 @@ Step 1
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local"}' http://127.0.0.1:5000/portal/reset
 ```
+
+In this case, a confirmatio code is sent to the email address to be used to set a new password.
 
 ```bash
 ---------- MESSAGE FOLLOWS ----------
@@ -274,6 +345,8 @@ Step 2
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN" -d '{"email":"k.santos@yahoo.local","password":"C74LptkFL4seJZYQ", "code":"30937"}' http://127.0.0.1:5000/portal/setpassword
 ```
+
+Once the new password is set, a notification os sent to the users email address again.
 
 ```bash
 ---------- MESSAGE FOLLOWS ----------
@@ -305,6 +378,9 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 Evn.ta]9zxP&#Wut", "old_password":"C74LptkFL4seJZYQ"}' http://127.0.0.1:5000/portal/reset
 ```
 
+In this case, only a single step is required since the user is already authenticated (with a valid token) and knows the account password.
+
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -332,6 +408,18 @@ b' 12216 to set a new password.'
 
 #### GET `/countries`
 
+###### Description
+
+This endpoint is used to get a list of countries.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of countries and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -352,6 +440,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries
 
 #### GET `/countries/{country_id}`
 
+###### Description
+
+This endpoint is used to get a single country.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the country details and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -370,6 +470,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/countries/54
 
 #### POST `/countries`
 
+###### Description
+
+This endpoint is used to create a country.
+
+###### Request Body
+
+The request body should have the name of the country.
+
+###### Response Body
+
+The normal response contains the id of the created country and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -385,6 +497,18 @@ curl -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN"
 
 #### PATCH `/countries/{country_id}`
 
+###### Description
+
+This endpoint is used to modify a country name.
+
+###### Request Body
+
+The request body should have the new name of the country.
+
+###### Response Body
+
+The normal response contains the id of the country and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -399,6 +523,18 @@ curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN
 ```
 
 #### DELETE `/countries/{country_id}`
+
+###### Description
+
+This endpoint is used to delete a country.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the country and a success value of True.
 
 ##### Sample Request and Response
 
@@ -416,6 +552,18 @@ curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN
 ### Cities
 
 #### GET `/cities/{city_id}`
+
+###### Description
+
+This endpoint is used to get a city.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the details of the city and a success value of True.
 
 ##### Sample Request and Response
 
@@ -436,6 +584,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/1
 ```
 
 #### GET `/cities`
+
+###### Description
+
+This endpoint is used to get a list of cities.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of cities a success value of True.
 
 ##### Sample Request and Response
 
@@ -483,6 +643,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/1
 
 #### POST `/cities`
 
+###### Description
+
+This endpoint is used to create a city.
+
+###### Request Body
+
+The request body should have the name of the city and the country id.
+
+###### Response Body
+
+The normal response contains the id of the city and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -498,6 +670,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/1
 ```
 
 #### PATCH `/cities/{city_id}`
+
+###### Description
+
+This endpoint is used to modify a city.
+
+###### Request Body
+
+The request body should have the new name of the city and/or the new country id.
+
+###### Response Body
+
+The normal response contains the id of the city and a success value of True.
 
 ##### Sample Request and Response
 
@@ -515,6 +699,18 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 
 #### DELETE `/cities/{city_id}`
 
+###### Description
+
+This endpoint is used to delete a city.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the city and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -531,6 +727,18 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/cities/70
 ### Positions
 
 #### GET `/positions`
+
+###### Description
+
+This endpoint is used to get a list of positions.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of positions and a success value of True.
 
 ##### Sample Request and Response
 
@@ -568,6 +776,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions
 
 #### GET `/positions/{position_id}`
 
+###### Description
+
+This endpoint is used to get a position.
+
+###### Request Body
+
+The request body should be empty
+
+###### Response Body
+
+The normal response contains the details of the position and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -587,6 +807,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions
 
 #### POST `/positions`
 
+###### Description
+
+This endpoint is used to create a position.
+
+###### Request Body
+
+The request body should have the name of the position and a number of initial players per team in that position.
+
+###### Response Body
+
+The normal response contains the id of the position and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -601,6 +833,18 @@ curl -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN"
 ```
 
 #### PATCH `/positions/{position_id}`
+
+###### Description
+
+This endpoint is used to modify a position.
+
+###### Request Body
+
+The request body should have the name of the position and the number of initial players in that position per team.
+
+###### Response Body
+
+The normal response contains the id of the position and a success value of True.
 
 ##### Sample Request and Response
 
@@ -618,6 +862,18 @@ curl -X PATCH -H 'Content-Type:application/json' -H "Authorization:Bearer $TOKEN
 
 #### DELETE `/positions/{position_id}`
 
+###### Description
+
+This endpoint is used to delete.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the position and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -634,6 +890,18 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN" http://127.0.0.1:5000/positions/
 ### Accounts
 
 #### GET `/accounts`
+
+###### Description
+
+This endpoint is used to get user accounts.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of accounts and a success value of True.
 
 ##### Sample Request and Response
 
@@ -658,9 +926,25 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/accounts
 ```
 
 #### GET `/accounts/me`
+
+###### Description
+
+This endpoint is used to get the logged in users account.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the account details and a success value of True.
+
 ```bash
 curl -X GET -H "Authorization:Bearer $CREATOR" http://127.0.0.1:5000/accounts/me
 ```
+
+###### Sample Request and Response
+
 ```json
 {
   "account": {
@@ -671,9 +955,21 @@ curl -X GET -H "Authorization:Bearer $CREATOR" http://127.0.0.1:5000/accounts/me
 }
 ```
 
-#### GET `/accounts/{account_id}`
+##### GET `/accounts/{account_id}`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get an account.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the details of the account and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18
@@ -689,9 +985,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18
 }
 ```
 
-#### GET `/accounts/{account_id}/teams/`
+##### GET `/accounts/{account_id}/teams/`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get teams (the system currently restricts a user to a single team) for the account.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the list of teams and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18/teams
@@ -712,9 +1020,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/accounts/18/
 }
 ```
 
-#### POST `/accounts`
+##### POST `/accounts`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to create an account, team and players.
+
+###### Request Body
+
+The request body should have the country id of their team and the nickname of the user.
+
+###### Response Body
+
+The normal response contains the id of the created account and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X POST -H "Authorization:Bearer $TOKEN2" -H "Content-Type:application/json" -d '{"country":14,"nickname":"slayer102"}' http://127.0.0.1:5000/accounts
@@ -727,9 +1047,21 @@ curl -X POST -H "Authorization:Bearer $TOKEN2" -H "Content-Type:application/json
 }
 ```
 
-#### PATCH `/accounts`
+##### PATCH `/accounts`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to modify the nickname of the user account.
+
+###### Request Body
+
+The request body should have the new nickname.
+
+###### Response Body
+
+The normal response contains the id of the user account and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"nickname":"the_urge22"}' http://127.0.0.1:
@@ -743,11 +1075,23 @@ curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/jso
 }
 ```
 
-### Teams
+#### Teams
 
-#### GET `/teams`
+##### GET `/teams`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get teams.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of teams and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams
@@ -781,9 +1125,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams
 }
 ```
 
-#### GET `/teams/{team_id}`
+##### GET `/teams/{team_id}`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get a team.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains details of the team and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams/8
@@ -805,9 +1161,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/teams/8
 }
 ```
 
-#### GET `/teams/{team_id}/players`
+##### GET `/teams/{team_id}/players`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get players by team id.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the list of players and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/teams/9/players
@@ -1081,9 +1449,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/teams/9/play
 }
 ```
 
-#### PATCH `/team/{team_id}`
+##### PATCH `/team/{team_id}`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to modify a team name.
+
+###### Request Body
+
+The request body should have the new name of the team.
+
+###### Response Body
+
+The normal response contains the id of the team a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN2" -d '{"name":"Lucerne Vikings"}' http://127.0.0.1
@@ -1097,11 +1477,25 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 }
 ```
 
-### Players
+#### Players
 
-#### GET `/players`
 
-##### Sample Request and Response
+
+##### GET `/players`
+
+###### Description
+
+This endpoint is used to get players.
+
+###### Request Body
+
+The request body should be empty
+
+###### Response Body
+
+The normal response contains the list of players and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
  curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/players
@@ -1232,9 +1626,21 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 }
 ```
 
-#### GET `/players/{player_id}`
+##### GET `/players/{player_id}`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get a player.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the details of the player and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
@@ -1259,9 +1665,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/players/140
 }
 ```
 
-#### PATCH `/players/{player_id}`
+##### PATCH `/players/{player_id}`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to modify a player name.
+
+###### Request Body
+
+The request body should have the new firstname and lastname of the player.
+
+###### Response Body
+
+The normal response contains the id of the player and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Rudolfo","lastname":"Oliveira"
@@ -1275,11 +1693,23 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 }
 ```
 
-### Transfers
+#### Transfers
 
-#### GET `/transfers`
+##### GET `/transfers`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get transfers.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the list of transfers and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
@@ -1287,7 +1717,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
 
 ```json
 {
-  "accounts": [
+  "transfers": [
     {
       "date_completed": null,
       "date_listed": "Wed, 12 Jan 2022 07:40:34 GMT",
@@ -1304,9 +1734,21 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
 }
 ```
 
-#### GET `/transfers/state/{state_id}`
+##### GET `/transfers/state/{state_id}`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to get transfers by state (complete or incomplete).
+
+###### Request Body
+
+The request body should be empty
+
+###### Response Body
+
+The normal response contains a list of transfers and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/state/0
@@ -1314,7 +1756,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/st
 
 ```json
 {
-  "accounts": [
+  "transfers": [
     {
       "date_completed": null,
       "date_listed": "Wed, 12 Jan 2022 07:40:34 GMT",
@@ -1333,6 +1775,18 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/st
 
 #### POST `/transfers`
 
+###### Description
+
+This endpoint is used to create a transfer.
+
+###### Request Body
+
+The request body should have the player id, origin team, and transfer value.
+
+###### Response Body
+
+The normal response contains the id of the transfer and a success value of True.
+
 ##### Sample Request and Response
 
 ```bash
@@ -1346,9 +1800,21 @@ curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1
 }
 ```
 
-#### PATCH `/transfers`
+##### PATCH `/transfers`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to modify a transfer value.
+
+###### Request Body
+
+The request body should have the new value of the transfer.
+
+###### Response Body
+
+The normal response contains the id of the transfer and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1750000"}' http://127.0.0.1:5000/transfers/3
@@ -1361,9 +1827,21 @@ curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/jso
 }
 ```
 
-#### DELETE `/transfers`
+##### DELETE `/transfers`
 
-##### Sample Request and Response
+###### Description
+
+This endpoint is used to delete a transfer.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the transfer and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/transfers/3
@@ -1376,9 +1854,23 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/transfers
 }
 ```
 
-### Bids
+#### Bids
 
-#### GET `/bids`
+##### GET `/bids`
+
+###### Description
+
+This endpoint is used to get bids.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of bids and a success value of True.
+
+###### Sample Request and Response
 
 ```json
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids
@@ -1401,6 +1893,20 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids
 
 #### GET `/transfers/{transfer_id}/bids'
 
+###### Description
+
+This endpoint is used to get bids for a transfer.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains a list of bids and a success value of True.
+
+###### Sample Request and Response
+
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/4/bids
 ```
@@ -1422,6 +1928,20 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/4/
 
 #### POST `/transfers/{transfer_id}/bids`
 
+###### Description
+
+This endpoint is used to submit a bid.
+
+###### Request Body
+
+The request body should have the value of the bid.
+
+###### Response Body
+
+The normal response contains the id of the bid and a success value of True.
+
+###### Sample Request and Response
+
 ```bash
 curl -X POST -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1500000"}' http://127.0.0.1:5000/transfers/4/bids
 ```
@@ -1434,6 +1954,20 @@ curl -X POST -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json
 ```
 
 #### PATCH `/transfers/{transfer_id}/bids`
+
+###### Description
+
+This endpoint is used to modify the value of a bid.
+
+###### Request Body
+
+The request body should have the new value. 
+
+###### Response Body
+
+The normal response contains the id of the bid and a success value of True.
+
+###### Sample Request and Response
 
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1650000"}' http://127.0.0.1:5000/t
@@ -1449,6 +1983,20 @@ ransfers/4/bids
 
 #### DELETE `/bids/{bid_id}
 
+###### Description
+
+This endpoint is used to delete a bid.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the bid and a success value of True.
+
+###### Sample Request and Response
+
 ```bash
 curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids/7
 ```
@@ -1462,9 +2010,25 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids/7
 
 #### PATCH `/bids/select/{bid_id}`
 
+###### Description
+
+This endpoint is used to select a winning bid.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the bid and a success value of True.
+
+###### Sample Request and Response
+
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN2"  http://127.0.0.1:5000/bids/select/8
 ```
+
+An email is also sent to the bidder.
 
 ```bash
 ---------- MESSAGE FOLLOWS ----------
@@ -1491,9 +2055,25 @@ b'Please confirm the transfer to complete the transaction.'
 
 #### PATCH `/bids/confirm/{bid_id}`
 
+###### Description
+
+This endpoint is used to confirm a transfer.
+
+###### Request Body
+
+The request body should be empty.
+
+###### Response Body
+
+The normal response contains the id of the winning bid and a success value of True.
+
+###### Sample Request and Response
+
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1"  http://127.0.0.1:5000/bids/confirm/8
 ```
+
+An email is sent to the creator of the transfer (origin team).
 
 ```bash
 ---------- MESSAGE FOLLOWS ----------
