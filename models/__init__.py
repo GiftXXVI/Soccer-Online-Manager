@@ -58,7 +58,7 @@ class Credential(db.Model, OnlineManagerModel):
     reset_required = db.Column(db.Boolean(), nullable=False, default=True)
     active = db.Column(db.Boolean(), nullable=False, default=True)
     account = db.relationship('Account', backref='credential', lazy=True)
-    role_id = db.Column(db.Integer(), unique=True, nullable=False)
+    role_id = db.Column(db.Integer(), unique=False, nullable=False)
 
     def setup(self, role=0) -> None:
         self.active = False
@@ -261,12 +261,14 @@ class Transfer(db.Model, OnlineManagerModel):
     def bid_selected(self):
         self.value_increase = randrange(110, 201)/100
 
+
     def transfer_confirmed(self, player_value, team_id):
         now = datetime.now()
         self.date_completed = now.date()
         self.transfer_value = player_value
         self.to_team_id = team_id
         self.player.value = player_value * self.value_increase
+        self.player.transfer_listed = False
         self.player.team_id = team_id
         self.from_team.budget += player_value
         self.to_team.budget -= player_value

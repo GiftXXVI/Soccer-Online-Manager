@@ -77,6 +77,7 @@ def create_transfer() -> jsonify:
                         transfer_value=request_transfer_value)
                     try:
                         transfer.setup()
+                        player.transfer_listed=True
                         transfer.insert()
                         transfer.apply()
                         transfer.refresh()

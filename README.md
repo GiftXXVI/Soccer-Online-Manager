@@ -1,5 +1,30 @@
 ## Getting Started
 
+### Getting Started
+
+Base URL: the API can be accessed at the following URL `http://127.0.0.1:5000`
+
+Authentication: The API requires a valid Token to accompany every request before access can be granted depending on the claims present in the Token and the identity of the user.
+
+### Dependencies
+
+Install all dependencies by running the following command from the root directory (preferably inside a virtual environment):
+
+```bash
+pip install -r requirements.txt
+```
+
+### Tech Stack/Tools
+The project has been developed using the following tech stack:
+
+Python 3.8.10
+PostgreSQL 12
+The versions of all libraries can be found in the file requirements.txt
+
+The code was written in Visual Studio Code 1.62.0 on Windows 10 WSL inside Ubuntu 20.04.3 LTS.
+
+### Databases
+
 Created the live database using the following command:
 
 ```bash
@@ -548,6 +573,20 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/accounts
       "id": 18
     }
   ],
+  "success": true
+}
+```
+
+#### GET `/accounts/me`
+```bash
+curl -X GET -H "Authorization:Bearer $CREATOR" http://127.0.0.1:5000/accounts/me
+```
+```json
+{
+  "account": {
+    "email": "peter.watanabe@yahoo.local",
+    "id": 19
+  },
   "success": true
 }
 ```
@@ -1260,9 +1299,11 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/transfers
 ### Bids
 
 #### GET `/bids`
+
 ```json
 curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids
 ```
+
 ```bash
 {
   "bids:": [
@@ -1279,9 +1320,11 @@ curl -X GET -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids
 ```
 
 #### GET `/transfers/{transfer_id}/bids'
+
 ```bash
 curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/4/bids
 ```
+
 ```json
 {
   "bids": [
@@ -1300,7 +1343,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers/4/
 #### POST `/transfers/{transfer_id}/bids`
 
 ```bash
-curl -X POST -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"team":9,"value":"1500000"}' http://127.0.0.curl -X POST -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1500000"}' http://127.0.0.1:5000/transfers/4/bids
+curl -X POST -H "Authorization:Bearer $TOKEN1" -H "Content-Type:application/json" -d '{"value":"1500000"}' http://127.0.0.1:5000/transfers/4/bids
 ```
 
 ```json
@@ -1336,10 +1379,13 @@ curl -X DELETE -H "Authorization:Bearer $TOKEN1" http://127.0.0.1:5000/bids/7
   "success": true
 }
 ```
+
 #### PATCH `/bids/select/{bid_id}`
+
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN2"  http://127.0.0.1:5000/bids/select/8
 ```
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -1355,16 +1401,20 @@ b'Please confirm the transfer to complete the transaction.'
 ------------ END MESSAGE ------------
 
 ```
+
 ```json
 {
   "modified": 4,
   "success": true
 }
 ```
+
 #### PATCH `/bids/confirm/{bid_id}`
+
 ```bash
 curl -X PATCH -H "Authorization:Bearer $TOKEN1"  http://127.0.0.1:5000/bids/confirm/8
 ```
+
 ```bash
 ---------- MESSAGE FOLLOWS ----------
 b'Content-Type: text/plain; charset="utf-8"'
@@ -1379,10 +1429,10 @@ b'The transfer of the player Kofi Phirihas been confirmed at 2022-01-12 23:52:4=
 b'3.'
 ------------ END MESSAGE ------------
 ```
+
 ```json
 {
   "modified": 8,
   "success": true
 }
 ```
-

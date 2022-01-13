@@ -25,6 +25,22 @@ def get_accounts() -> jsonify:
         abort(401)
 
 
+@accounts_bp.route('/accounts/me', methods=['GET'])
+@jwt_required()
+def get_my_account() -> jsonify:
+    '''get a list of accounts'''
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    credential = Credential.query.filter(
+        Credential.email == identity).one_or_none()
+    account = Account.query.filter(
+        Account.credential_id == credential.id).one_or_none()
+    return jsonify({
+        'success': True,
+        'account': account.format()
+    })
+
+
 @accounts_bp.route('/accounts/<int:account_id>', methods=['GET'])
 @jwt_required()
 def get_account(account_id) -> jsonify:

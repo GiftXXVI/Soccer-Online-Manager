@@ -247,37 +247,39 @@ def confirm_transfer(bid_id) -> jsonify:
         abort(400)
     if bid.selected == True and \
         transfer.id == bid.transfer_id and \
+        bid.team_id == to_team.id and \
         transfer.from_team_id != to_team.id and \
             transfer.date_completed == None:
-        # try:
-        player_value = bid.bid_value
+        try:
+            player_value = bid.bid_value
 
-        transfer.transfer_confirmed(player_value, to_team.id)
-        transfer.stage()
+            transfer.transfer_confirmed(player_value, to_team.id)
+            transfer.stage()
 
-        transfer.apply()
-        now = datetime.now()
-        f_now = now.strftime("%Y-%m-%d %H:%M:%S")
-        message = f'The transfer of the player {transfer.player.name()}' + \
-            f'has been confirmed at {f_now}.'
+            transfer.apply()
+            now = datetime.now()
+            f_now = now.strftime("%Y-%m-%d %H:%M:%S")
+            message = f'The transfer of the player {transfer.player.name()}' + \
+                f'has been confirmed at {f_now}.'
 
-        from_address = Credential.query.filter(
-            Credential.id == from_team.account.credential_id).one_or_none()
+            from_address = Credential.query.filter(
+                Credential.id == from_team.account.credential_id).one_or_none()
 
-        sendmail(from_address.email, message)
+            sendmail(from_address.email, message)
 
-        # except sqlalchemy.exc.SQLAlchemyError as e:
-        #    transfer.rollback()
-        #    error_state = True
-        # finally:
-        #    transfer.dispose()
-        #    if error_state:
-        #        abort(500)
-        #    else:
-        return jsonify({
-            'success': True,
-            'modified': bid.id
-        })
+        except sqlalchemy.exc.SQLAlchemyError as e:
+            transfer.rollback()
+            error_state = True
+        finally:
+            bid_id = bid.id
+            transfer.dispose()
+            if error_state:
+                abort(500)
+            else:
+                return jsonify({
+                    'success': True,
+                    'modified': bid_id
+                })
     else:
         abort(401)
 
