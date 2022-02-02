@@ -56,7 +56,8 @@ def get_transfer_bids(transfer_id):
         })
     else:
         bid = Bid.query.filter(
-            Bid.transfer_id == transfer_id, Bid.team_id == team.id).one_or_none()
+            Bid.transfer_id == transfer_id,
+            Bid.team_id == team.id).one_or_none()
         if bid is not None:
             return jsonify({
                 'success': True,
@@ -85,7 +86,7 @@ def create_bid(transfer_id) -> jsonify:
         transfer = Transfer.query.filter(
             Transfer.id == transfer_id).one_or_none()
         bids = Bid.query.filter(Bid.team_id == team.id).all()
-        if transfer.date_completed == None and \
+        if transfer.date_completed is None and \
             len(bids) == 0 and   \
                 transfer.from_team_id != team.id:
             bid = Bid(transfer_id=transfer.id,
@@ -128,8 +129,9 @@ def modify_bid(transfer_id) -> jsonify:
     else:
         request_value = request_body.get('value', None)
         bid = Bid.query.filter(
-            Bid.transfer_id == transfer_id, Bid.team_id == team.id).one_or_none()
-        if bid.transfer.date_completed == None and \
+            Bid.transfer_id == transfer_id,
+            Bid.team_id == team.id).one_or_none()
+        if bid.transfer.date_completed is None and \
                 bid.transfer.from_team_id != team.id:
             try:
                 bid.bid_value = request_value
@@ -175,7 +177,7 @@ def select_bid(bid_id) -> jsonify:
     if transfer.from_team_id == team.id and \
             selected_bid.team_id != team.id and \
             team.id not in [bid.team_id for bid in other_bids] and \
-            transfer.date_completed == None:
+            transfer.date_completed is None:
         try:
             # update transfer
             transfer.bid_selected()
@@ -245,11 +247,11 @@ def confirm_transfer(bid_id) -> jsonify:
 
     if bid is None:
         abort(400)
-    if bid.selected == True and \
+    if bid.selected and \
         transfer.id == bid.transfer_id and \
         bid.team_id == to_team.id and \
         transfer.from_team_id != to_team.id and \
-            transfer.date_completed == None:
+            transfer.date_completed is None:
         try:
             player_value = bid.bid_value
 
@@ -300,7 +302,7 @@ def delete_bid(bid_id) -> jsonify:
         Bid.id == bid_id, Bid.team_id == team.id).one_or_none()
     if bid is None:
         abort(400)
-    if bid.transfer.date_completed == None and \
+    if bid.transfer.date_completed is None and \
             bid.transfer.from_team_id != team.id:
         try:
             bid.delete()

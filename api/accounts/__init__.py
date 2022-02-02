@@ -111,8 +111,10 @@ def create_account() -> jsonify:
                     positions = Position.query.all()
                     for position in positions:
                         for i in range(position.initial_players):
-                            player = Player(country_id=request_country,
-                                            position_id=position.id, team_id=team.id)
+                            player = Player(
+                                country_id=request_country,
+                                position_id=position.id,
+                                team_id=team.id)
                             player.setup()
                             player.insert()
                             player.stage()
@@ -148,7 +150,8 @@ def modify_account(account_id) -> jsonify:
     else:
         request_nickname = request_body.get('nickname', None)
         account = Account.query.filter(
-            Account.id == account_id, Account.credential_id == credential.id).one_or_none()
+            Account.id == account_id,
+            Account.credential_id == credential.id).one_or_none()
         if account is None or request_nickname is None:
             abort(400)
         else:

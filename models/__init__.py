@@ -179,6 +179,7 @@ class Player(db.Model, OnlineManagerModel):
                 'firstname': self.firstname,
                 'lastname': self.lastname,
                 'date_of_birth': self.date_of_birth,
+                'age': self.age(),
                 'country_id': self.country_id,
                 'country': self.country.name,
                 'team_id': self.team_id,
@@ -196,7 +197,8 @@ class Position(db.Model, OnlineManagerModel):
     players = db.relationship('Player', backref='position', lazy=True)
 
     def format(self) -> dict:
-        return {'id': self.id, 'name': self.name, 'initial_players': self.initial_players}
+        return {'id': self.id, 'name': self.name,
+                'initial_players': self.initial_players}
 
 
 class City(db.Model, OnlineManagerModel):
@@ -259,8 +261,7 @@ class Transfer(db.Model, OnlineManagerModel):
                 'date_completed': self.date_completed}
 
     def bid_selected(self):
-        self.value_increase = randrange(110, 201)/100
-
+        self.value_increase = randrange(110, 201) / 100
 
     def transfer_confirmed(self, player_value, team_id):
         now = datetime.now()

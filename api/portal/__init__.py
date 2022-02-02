@@ -99,8 +99,10 @@ def confirm_credential(credential_id) -> jsonify:
                 abort(400)
             else:
                 try:
-                    ph.verify(credential.confirmation_code, Credential.get_confirmation_code(
-                        code=request_code))
+                    ph.verify(
+                        credential.confirmation_code,
+                        Credential.get_confirmation_code(
+                            code=request_code))
                     if ph.check_needs_rehash(credential.confirmation_code):
                         ph.hash(request_code)
                     credential.activate()
@@ -147,7 +149,8 @@ def issue_token() -> jsonify:
                     if credential.active and not credential.reset_required:
                         claims = {'sm_role': credential.role_id}
                         token = create_access_token(
-                            identity=request_email, expires_delta=timedelta(minutes=60), fresh=True, additional_claims=claims)
+                            identity=request_email, expires_delta=timedelta(
+                                minutes=60), fresh=True, additional_claims=claims)
                         return jsonify({
                             'success': True,
                             'token': token
@@ -178,7 +181,8 @@ def refresh_token() -> jsonify:
             if request_email == identity:
                 claims = {'sm_role': credential.role_id}
                 token = create_access_token(
-                    identity=identity, expires_delta=timedelta(minutes=60), fresh=False, additional_claims=claims)
+                    identity=identity, expires_delta=timedelta(
+                        minutes=60), fresh=False, additional_claims=claims)
                 return jsonify({
                     'success': True,
                     'token': token

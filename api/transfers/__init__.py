@@ -32,10 +32,10 @@ def get_transfers_state(completed) -> jsonify:
     '''get a list of transfers by state'''
     if completed == 0:
         transfers = Transfer.query.filter(
-            Transfer.date_completed == None).all()
+            Transfer.date_completed is None).all()
     elif completed == 1:
         transfers = Transfer.query.filter(
-            Transfer.date_completed != None).all()
+            Transfer.date_completed is not None).all()
     transfers_f = [transfer.format() for transfer in transfers]
     return jsonify({
         'success': True,
@@ -66,7 +66,8 @@ def create_transfer() -> jsonify:
             team = Team.query.filter(
                 Team.id == request_from_team).one_or_none()
             player_active_transfers = Transfer.query.filter(
-                Transfer.player_id == request_player, Transfer.date_completed is not None).all()
+                Transfer.player_id == request_player,
+                Transfer.date_completed is not None).all()
             if player is not None and team is not None:
                 if len(player_active_transfers) == 0 and \
                         player.team_id == team.id and \
@@ -77,7 +78,7 @@ def create_transfer() -> jsonify:
                         transfer_value=request_transfer_value)
                     try:
                         transfer.setup()
-                        player.transfer_listed=True
+                        player.transfer_listed = True
                         transfer.insert()
                         transfer.apply()
                         transfer.refresh()
@@ -124,7 +125,7 @@ def modify_transfer(transfer_id):
                     Player.id == transfer.player_id).one_or_none()
                 team = Team.query.filter(
                     Team.id == transfer.from_team_id).one_or_none()
-                if transfer.date_completed == None and \
+                if transfer.date_completed is None and \
                         player.team_id == team.id and \
                         team.account.credential_id == credential.id:
                     try:
@@ -162,7 +163,7 @@ def delete_transfer(transfer_id) -> jsonify:
             Player.id == transfer.player_id).one_or_none()
         team = Team.query.filter(
             Team.id == transfer.from_team_id).one_or_none()
-        if transfer.date_completed == None and \
+        if transfer.date_completed is None and \
                 player.team_id == team.id and \
                 team.account.credential_id == credential.id:
             try:

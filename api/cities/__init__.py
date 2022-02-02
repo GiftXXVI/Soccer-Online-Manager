@@ -41,7 +41,7 @@ def create_city() -> jsonify:
     request_body = request.get_json()
     error_state = False
     claims = get_jwt()
-    if claims['sm_role']==1:
+    if claims['sm_role'] == 1:
         if request_body is None:
             abort(400)
         else:
@@ -71,6 +71,7 @@ def create_city() -> jsonify:
     else:
         abort(401)
 
+
 @cities_bp.route('/cities/<int:city_id>', methods=['PATCH'])
 @jwt_required()
 def modify_city(city_id) -> jsonify:
@@ -78,7 +79,7 @@ def modify_city(city_id) -> jsonify:
     request_body = request.get_json()
     error_state = False
     claims = get_jwt()
-    if claims['sm_role']==1:
+    if claims['sm_role'] == 1:
         if request_body is None:
             abort(400)
         else:
@@ -111,13 +112,14 @@ def modify_city(city_id) -> jsonify:
     else:
         abort(401)
 
+
 @cities_bp.route('/cities/<int:city_id>', methods=['DELETE'])
 @jwt_required()
 def delete_city(city_id) -> jsonify:
     '''delete a city'''
     error_state = False
     claims = get_jwt()
-    if claims['sm_role']==1:
+    if claims['sm_role'] == 1:
         city = City.query.filter(City.id == city_id).one_or_none()
         if city is None:
             abort(400)
