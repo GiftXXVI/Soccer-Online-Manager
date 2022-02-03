@@ -174,7 +174,7 @@ curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1
 Or with an optional role parameter:
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Kwabena","lastname":"Santos","date_of_birth":"1999-12-12","email":"gift.chimphonda@gmail.local","password":";;87^child^BORROW^each^04;;","role":1}' http://127.0.0.1:5000/portal/register
+curl -X POST -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN1" -d '{"firstname":"Koffi","lastname":"Sato","date_of_birth":"1999-12-12","email":"koffi.sato@gmail.local","password":";;87^child^BORROW^each^04;;","role":1}' http://127.0.0.1:5000/portal/register
 ```
 
 ```json
@@ -1699,7 +1699,7 @@ curl -X PATCH -H "Content-Type:application/json" -H "Authorization:Bearer $TOKEN
 
 ###### Description
 
-This endpoint is used to get transfers.
+This endpoint is used to get transfers. Only a user with priviledged access can view all transfers.
 
 ###### Request Body
 
@@ -1738,7 +1738,7 @@ curl -X GET -H "Authorization:Bearer $TOKEN2" http://127.0.0.1:5000/transfers
 
 ###### Description
 
-This endpoint is used to get transfers by state (complete or incomplete).
+This endpoint is used to get transfers by state (complete or incomplete). Any user can get transfers by state.
 
 ###### Request Body
 

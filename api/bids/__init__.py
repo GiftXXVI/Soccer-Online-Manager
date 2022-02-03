@@ -167,7 +167,8 @@ def select_bid(bid_id) -> jsonify:
 
     selected_bid = Bid.query.filter(
         Bid.id == bid_id).one_or_none()
-
+    if selected_bid is None:
+        abort(404)
     transfer = Transfer.query.filter(
         Transfer.id == selected_bid.transfer_id).one_or_none()
 
@@ -239,6 +240,8 @@ def confirm_transfer(bid_id) -> jsonify:
 
     bid = Bid.query.filter(
         Bid.id == bid_id).one_or_none()
+    if bid is None:
+        abort(400)
     transfer = Transfer.query.filter(
         Transfer.id == bid.transfer_id).one_or_none()
     from_team = Team.query.filter(
