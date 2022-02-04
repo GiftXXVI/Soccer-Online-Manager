@@ -2096,3 +2096,26 @@ b'3.'
   "success": true
 }
 ```
+## Deployment
+### Docker
+#### Build Image
+```bash
+docker build -t soccer-manager .
+```
+#### Run Container
+```bash
+docker run -dp 8080:8080 soccer-manager \
+-e APP_MODE='LIVE' \
+-e LIVEDB_NAME='soccer_manager' \
+-e LIVEDB_USER='app' \
+-e LIVEDB_PASS='' \
+-e LIVEDB_HOST='localhost' \
+-e LIVEDB_PORT='5432' \
+-e TESTDB_NAME='soccer_manager_test' \
+-e TESTDB_USER='app' \
+-e TESTDB_PASS='' \
+-e TESTDB_HOST='localhost' \
+-e TESTDB_PORT='5432' \
+-e INIT_PLAYER_VALUE='1000000' \
+-e INIT_TEAM_BUDGET='4000000'
+```
