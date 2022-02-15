@@ -15,15 +15,15 @@ def get_transfers() -> jsonify:
     '''get a list of transfers'''
     identity = get_jwt_identity()
     claims = get_jwt()
-    if claims['sm_role'] == 1:
-        transfers = Transfer.query.all()
-        transfers_f = [transfer.format() for transfer in transfers]
-        return jsonify({
-            'success': True,
-            'transfers': transfers_f
-        })
-    else:
-        abort(401)
+    #if claims['sm_role'] == 1:
+    transfers = Transfer.query.all()
+    transfers_f = [transfer.format() for transfer in transfers]
+    return jsonify({
+        'success': True,
+        'transfers': transfers_f
+    })
+    #else:
+    #    abort(401)
 
 
 @transfers_bp.route('/transfers/state/<int:completed>', methods=['GET'])
